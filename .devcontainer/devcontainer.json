@@ -1,10 +1,5 @@
 {
-  "name": "KAIROS Verifier — automatic replay",
-  "image": "mcr.microsoft.com/devcontainers/python:3.12",
-  "postCreateCommand": "bash .devcontainer/run_verifier.sh",
-  "customizations": {
-    "vscode": {
-      "extensions": []
-    }
-  }
+  "name": "KAIROS DEMO 2 — Acte 2 replay automatique",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "postCreateCommand": "bash .devcontainer/run_verifier.sh"
 }
