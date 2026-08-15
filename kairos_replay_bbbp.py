@@ -27,26 +27,44 @@ def sha256(path):
 
 
 def main():
-    print("pandas", pd.__version__, "| pyarrow", pa.__version__)
+    checks = []
 
     # 1. Telecharger le dataset depuis sa source publique
     urllib.request.urlretrieve(SOURCE, "BBBP.csv")
     csv_h = sha256("BBBP.csv")
-    print("CSV telecharge :", csv_h)
-    print("CSV attendu    :", CSV_SHA256_ATTENDU)
-    assert csv_h == CSV_SHA256_ATTENDU, "Le CSV source ne correspond pas."
+    checks.append(("Source SHA-256", csv_h == CSV_SHA256_ATTENDU))
 
     # 2. Transformation : trois appels de bibliotheques open source
     df = pd.read_csv("BBBP.csv", low_memory=False)
-    print("lignes :", len(df))
     t = pa.Table.from_pandas(df)
     pq.write_table(t, "bbbp.parquet", compression="snappy")
 
     # 3. Empreinte et comparaison avec l'artefact scelle
     obtenu = sha256("bbbp.parquet")
-    print("parquet obtenu :", obtenu)
-    print("parquet scelle :", PARQUET_SHA256_SCELLE)
-    print(">>> MATCH" if obtenu == PARQUET_SHA256_SCELLE else ">>> DIVERGE")
+    checks.append(("Reconstruction", len(df) == 2050))
+    checks.append(("Sealed artifact", obtenu == PARQUET_SHA256_SCELLE))
+
+    result = all(ok for _, ok in checks)
+
+    print()
+    print("KAIROS REPLAY")
+    print("-" * 40)
+    for label, ok in checks:
+        print(f"{label:<22}{'MATCH' if ok else 'DIVERGE'}")
+    print()
+    print(f"{'RESULT':<22}{'PASS' if result else 'FAIL'}")
+    print("-" * 40)
+    print()
+    if not result:
+        print("DIVERGENCE — ne pas interpreter silencieusement.")
+        print("Voir le dossier complet, section Lecture des ecarts.")
+        print()
+    print("Detail :")
+    print("  parquet obtenu :", obtenu)
+    print("  parquet scelle :", PARQUET_SHA256_SCELLE)
+    print()
+    print("Ce resultat provient d'un vehicule d'execution (Colab/Codespaces/Kaggle).")
+    print("La preuve est le resultat deterministe et son empreinte, pas la plateforme utilisee.")
 
 
 if __name__ == "__main__":
