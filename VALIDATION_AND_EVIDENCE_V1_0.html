@@ -628,13 +628,13 @@ body.gate-locked > #gate-flash{visibility:visible;}
 <div class="dl">
   <div class="fn">validation_externe.sh</div>
   <div class="fr">Outil de vérification guidée. Code source lisible, licence Apache 2.0. N'installe rien hors du répertoire de travail, ne demande aucun droit administrateur, ne modifie aucun fichier système.</div>
-  <div class="fm"><span>SHA-256</span><span class="hash">2a9ac46c…98065fce</span><span>15 503 octets</span></div>
+  <div class="fm"><span>SHA-256</span><span class="hash">bfb64ad5…c372f24fc</span><span>15 628 octets</span></div>
   <button class="kbtn p" data-dl="f-script" data-name="validation_externe.sh">Télécharger l'outil</button>
 </div>
 
 <div class="sub-title red">Contrôle d'intégrité avant exécution</div>
 <p class="body-text">Le validateur vérifie que l'outil téléchargé correspond à l'empreinte déclarée ci-dessous avant de l'exécuter.</p>
-<div class="big">2a9ac46c838d16b1855babf17bf3172e4e3325619018a5c2b88ee0d798065fce</div>
+<div class="big">bfb64ad5e5e793f11c55ffe0e48ea09e8f04a25d45bd1f04415df77c372f24fc</div>
 <pre class="code">sha256sum validation_externe.sh      # Linux
 shasum -a 256 validation_externe.sh  # macOS</pre>
 <p class="body-text">Si l'empreinte diffère, le fichier n'est pas celui décrit par le présent document: ne pas l'exécuter, et le signaler à l'adresse figurant au paragraphe 09.</p>
@@ -648,7 +648,7 @@ shasum -a 256 validation_externe.sh  # macOS</pre>
 <p class="body-text">L'outil demande une confirmation au démarrage, puis se déroule seul. Il affiche à chaque étape la commande exécutée, l'empreinte publiée et l'empreinte obtenue.</p>
 
 <div class="step"><header><span class="n">1</span><h4>Récupération du vérificateur</h4></header>
-<p class="body-text">Clone du dépôt public et contrôle de l'empreinte de <span class="hash">determinism_ladder.py</span>, qui doit valoir <span class="hash">f23de8df…</span>. Le vérificateur est lisible intégralement, n'utilise que numpy, pandas et xgboost, n'ouvre aucune connexion réseau et n'accède à aucun système Kairos.</p></div>
+<p class="body-text">Clone du dépôt public et contrôle de l'empreinte de <span class="hash">determinism_ladder.py</span>, qui doit valoir <span class="hash">e2f6cd4b…</span>. Le vérificateur est lisible intégralement, n'utilise que numpy, pandas et xgboost, n'ouvre aucune connexion réseau et n'accède à aucun système Kairos.</p></div>
 
 <div class="step"><header><span class="n">2</span><h4>Préparation de l'environnement de calcul</h4></header>
 <p class="body-text">Les bibliothèques déclarées exigent Python 3.10 ou supérieur. Si l'interpréteur du système est antérieur, l'outil installe un interpréteur 3.12 dans le répertoire de travail. La voie retenue est déclarée à l'écran et consignée dans le fichier d'attestation.</p></div>
@@ -690,7 +690,7 @@ pq.write_table(pa.Table.from_pandas(df), "bbbp.parquet", compression="snappy")</
 <table class="kt">
 <thead><tr><th style="width:32%">Élément</th><th>Empreinte SHA-256</th></tr></thead>
 <tbody>
-<tr><td>determinism_ladder.py<span class="l2">vérificateur public</span></td><td class="m"><span class="hash">f23de8df0d216dc6d79d0402103dcb2bb5ed1132eee83f10bf698c2cbae6d75c</span></td></tr>
+<tr><td>determinism_ladder.py<span class="l2">vérificateur public</span></td><td class="m"><span class="hash">e2f6cd4b4e67e98d19adbd76e9e8c12eae0276cca3755b324e55f3b966525be4</span></td></tr>
 <tr><td>BBBP.csv<span class="l2">jeu de données public</span></td><td class="m"><span class="hash">d07a38487aeac5cee5508413e468043ef3097451d2a112701c2d60be9ec6b662</span></td></tr>
 <tr><td>bbbp.parquet<span class="l2">artefact enregistré le 2026-06-06</span></td><td class="m"><span class="hash">4621ac8d5d4a728a169fb4d5b8c35682b954928a019d575e3eca140cd563489f</span></td></tr>
 </tbody></table>
@@ -721,18 +721,31 @@ pq.write_table(pa.Table.from_pandas(df), "bbbp.parquet", compression="snappy")</
 <div class="sec-eyebrow"><div class="sec-num">07</div><div class="sec-title">Résultats de référence</div><a class="plink" href="#pa-07-resultats-de-reference" aria-label="Lien permanent">#</a></div>
 <div class="sec-rule"></div>
 <p class="body-text">Kairos Systems a exécuté le présent protocole, dans son intégralité, préalablement à toute transmission. Les résultats ci-dessous constituent la référence à laquelle le validateur peut comparer son exécution.</p>
+<blockquote><span class="qlabel">Campagne courante</span>Les colonnes Instance A et Instance B ci-dessous proviennent de la campagne de re-vérification VALIDATION du 2026-08-17, sur infrastructure Kairos, avec VERIFIER v1.0 (commit <span class="hash">528f8595…</span>, SHA-256 <span class="hash">e2f6cd4b…</span>) et l'outil <span class="hash">validation_externe.sh</span> (SHA-256 <span class="hash">34dbeb1490c371f29aed1ddce3264096e47818d183f97be8333e95fc0eb750a9</span>). Trois exécutions indépendantes par instance, script identique sur les deux. Les colonnes macOS proviennent d'une campagne antérieure (2026-07-24, ancien VERIFIER) et sont conservées à titre de référence hors enveloppe — non re-mesurées dans la campagne courante.</blockquote>
 <table class="kt">
-<thead><tr><th style="width:26%">Mesure</th><th>Linux x86_64</th><th>macOS x86_64</th><th>macOS Apple Silicon</th></tr></thead>
+<thead><tr><th style="width:20%">Mesure</th><th>Instance A — RUN 1</th><th>Instance A — RUN 2</th><th>Instance A — RUN 3</th><th>Instance B — RUN 1</th><th>Instance B — RUN 2</th><th>Instance B — RUN 3</th></tr></thead>
 <tbody>
-<tr><td>Processeur</td><td>AMD EPYC 9V74</td><td>Intel Core i5-7360U</td><td>Apple M1<span class="l2">runner GitHub Actions macos-14</span></td></tr>
-<tr><td>Python du système</td><td class="m">3.12.1</td><td class="m">3.9.6</td><td class="m">3.14.6</td></tr>
-<tr><td>Voie d'exécution</td><td>venv sur l'interpréteur du système</td><td>interpréteur 3.12 en répertoire de travail</td><td>interpréteur 3.12 en répertoire de travail</td></tr>
-<tr><td>Échelle de déterminisme</td><td><b>12 identiques sur 12</b></td><td><b>9 identiques sur 12</b><span class="l2">L3, L6 mesures 1 et 2</span></td><td><b>8 identiques sur 12</b><span class="l2">L3, L5, L6 mesures 1 et 2</span></td></tr>
-<tr><td>Empreinte du vérificateur</td><td>identique</td><td>identique</td><td>identique</td></tr>
-<tr><td>Empreinte du jeu de données</td><td>identique</td><td>identique</td><td>identique</td></tr>
-<tr><td>Empreinte de l'artefact reconstruit</td><td><b>identique</b></td><td><b>identique</b></td><td><b>identique</b></td></tr>
-<tr><td>Durée observée</td><td class="m">10 min</td><td class="m">4 min 49 s</td><td class="m">58 s</td></tr>
-<tr><td>Date d'exécution</td><td class="m">2026-07-24</td><td class="m">2026-07-24</td><td class="m">2026-07-24</td></tr>
+<tr><td>Fournisseur</td><td colspan="3">Infomaniak — Suisse</td><td colspan="3">Scaleway — France</td></tr>
+<tr><td>Processeur</td><td colspan="3">AMD EPYC-Genoa Processor</td><td colspan="3">AMD EPYC 9555P 64-Core Processor</td></tr>
+<tr><td>Python du système</td><td colspan="3" class="m">3.10.12</td><td colspan="3" class="m">3.10.12</td></tr>
+<tr><td>Empreinte du vérificateur</td><td>identique</td><td>identique</td><td>identique</td><td>identique</td><td>identique</td><td>identique</td></tr>
+<tr><td>Échelle de déterminisme</td><td><b>12/12</b></td><td><b>12/12</b></td><td><b>12/12</b></td><td><b>12/12</b></td><td><b>12/12</b></td><td><b>12/12</b></td></tr>
+<tr><td>L3 sans OPENBLAS_CORETYPE</td><td colspan="3"><span class="hash">c210e706…</span></td><td colspan="3"><span class="hash">c210e706…</span></td></tr>
+<tr><td>Empreinte du jeu de données</td><td>identique</td><td>identique</td><td>identique</td><td>identique</td><td>identique</td><td>identique</td></tr>
+<tr><td>Empreinte de l'artefact reconstruit</td><td><b>identique</b></td><td><b>identique</b></td><td><b>identique</b></td><td><b>identique</b></td><td><b>identique</b></td><td><b>identique</b></td></tr>
+<tr><td>Date d'exécution</td><td colspan="3" class="m">2026-08-17</td><td colspan="3" class="m">2026-08-17</td></tr>
+</tbody></table>
+<p class="body-text">Script <span class="hash">validation_externe.sh</span> identique sur les six exécutions (SHA-256 <span class="hash">34dbeb1490c371f29aed1ddce3264096e47818d183f97be8333e95fc0eb750a9</span>), confirmé par contrôle d'intégrité avant chaque run. Preuves consignées et hashées: <span class="hash">EVIDENCE/RUN-A{1,2,3}_2026-08-17_v2</span> et <span class="hash">EVIDENCE/RUN-B{1,2,3}_2026-08-17_v2</span>, chacune avec <span class="hash">ATTESTATION_DATA.txt</span> et <span class="hash">SHA256SUMS.txt</span> vérifiés intègres.</p>
+
+<div class="sub-title">Référence historique — hors enveloppe (campagne 2026-07-24, ancien VERIFIER)</div>
+<table class="kt">
+<thead><tr><th style="width:26%">Mesure</th><th>macOS x86_64</th><th>macOS Apple Silicon</th></tr></thead>
+<tbody>
+<tr><td>Processeur</td><td>Intel Core i5-7360U</td><td>Apple M1<span class="l2">runner GitHub Actions macos-14</span></td></tr>
+<tr><td>Python du système</td><td class="m">3.9.6</td><td class="m">3.14.6</td></tr>
+<tr><td>Échelle de déterminisme</td><td><b>9 identiques sur 12</b><span class="l2">L3, L6 mesures 1 et 2</span></td><td><b>8 identiques sur 12</b><span class="l2">L3, L5, L6 mesures 1 et 2</span></td></tr>
+<tr><td>Empreinte de l'artefact reconstruit</td><td><b>identique</b></td><td><b>identique</b></td></tr>
+<tr><td>Date d'exécution</td><td class="m">2026-07-24</td><td class="m">2026-07-24</td></tr>
 </tbody></table>
 <p class="plabel">Lecture des résultats de référence</p>
 <p class="body-text">La reconstruction de l'artefact enregistré le 2026-06-06 aboutit à l'empreinte publiée sur les <b>trois plateformes</b>, deux systèmes d'exploitation et deux architectures de processeur. Cette reconstruction constitue la démonstration principale du protocole: elle ne dépend ni de l'implémentation BLAS, ni de la bibliothèque d'apprentissage, ni de l'architecture, mais de l'enveloppe de reconstruction, que l'outil installe dans le répertoire de travail.</p>
@@ -912,7 +925,7 @@ empreinte enregistrée et horodatée le 2026-06-06</pre><div class="pg">
 </div><pre class="code">git clone https://github.com/KAIROSSYSTEMSCH/KAIROS-VERIFIER.git
 cd KAIROS-VERIFIER
 sha256sum determinism_ladder.py</pre><div class="sub-title red">Ce qui est contrôlé</div>
-<p class="body-text">L'empreinte affichée doit correspondre à celle publiée</p><pre class="code">f23de8df0d216dc6d79d0402103dcb2bb5ed1132eee83f10bf698c2cbae6d75c</pre><div class="pg">
+<p class="body-text">L'empreinte affichée doit correspondre à celle publiée</p><pre class="code">e2f6cd4b4e67e98d19adbd76e9e8c12eae0276cca3755b324e55f3b966525be4</pre><div class="pg">
 <p>Le script exécuté est celui qui a produit les mesures publiées.</p>
 <p>Il est sous licence Apache 2.0 et lisible intégralement.</p>
 </div><div class="sub-title red">Ce qui est visible</div>
@@ -1031,6 +1044,7 @@ PYTHONHASHSEED=0</pre><div class="sub-title">Enveloppe B — reconstruction d'ar
 <p>Chaque élément de ces enveloppes est une variable déclarée et contrôlée.</p>
 <p>Hors de ces enveloppes, la reproductibilité byte-identique n'est pas revendiquée.</p>
 </div><div class="sub-title">Environnements sur lesquels l'enveloppe A a été vérifiée</div>
+<blockquote><span class="qlabel">Statut</span>Le tableau ci-dessous provient d'une campagne antérieure (2026-07-16). VERIFIER a depuis publié une nouvelle campagne de re-vérification (v1.0, 2026-08-16) qui supersede ces valeurs comme référence courante. Voir <a class="klink" href="https://github.com/KAIROSSYSTEMSCH/KAIROS-VERIFIER" rel="noopener">KAIROS-VERIFIER</a> pour l'état actuel, et §07 pour le résultat VALIDATION courant obtenu dans l'enveloppe A sur infrastructure Kairos.</blockquote>
 <table class="kt"><colgroup><col style="width:22%"><col style="width:26%"><col style="width:26%"><col style="width:14%"><col style="width:12%"></colgroup><thead><tr><th>Fournisseur</th><th>Processeur</th><th>Système</th><th>Python</th><th>Résultat</th></tr></thead><tbody>
 <tr><td>Scaleway France</td><td>AMD EPYC 9555P</td><td>Ubuntu 22.04</td><td>3.10.12</td><td>11 / 11</td></tr>
 <tr><td>Microsoft Azure</td><td>AMD EPYC 9V74</td><td>Ubuntu 24.04</td><td>3.12.1</td><td>11 / 11</td></tr>
@@ -1409,7 +1423,7 @@ openssl ts -verify -data audit_bundle.txt -in swisssign.tsr → OK</pre><p class
 <p>Chaque affirmation de ce document est adossée à une pièce vérifiable, conservée sur l'instance B</p>
 <p>Registre MASTER_EVIDENCE_REGISTER — ou publiée.</p>
 </div><table class="kt"><colgroup><col style="width:34%"><col style="width:32%"><col style="width:34%"></colgroup><thead><tr><th>Affirmation</th><th>Pièce</th><th>SHA-256</th></tr></thead><tbody>
-<tr><td>Vérificateur public authentifiable</td><td>determinism_ladder.py<span class="l2">dépôt public</span></td><td><span class='hash'>f23de8df…</span></td></tr>
+<tr><td>Vérificateur public authentifiable</td><td>determinism_ladder.py<span class="l2">dépôt public</span></td><td><span class='hash'>e2f6cd4b…</span></td></tr>
 <tr><td>12 mesures — 11 niveaux logiques<span class="l2">BYTE-IDENTIQUES</span><span class="l2">3 ENVIRONNEMENTS</span></td><td>ladder/20260716_envelope/<span class="l2">5 pièces + MANIFEST</span></td><td>KAIROS VERIFIER public, §2</td></tr>
 <tr><td>Source publique BBBP</td><td>deepchemdata.s3…/BBBP.csv</td><td><span class='hash'>d07a3848…</span></td></tr>
 <tr><td>Artefact reconstruit<span class="l2">= ARTEFACT ENREGISTRÉ</span></td><td>registre du 2026-06-06</td><td><span class='hash'>4621ac8d…</span></td></tr>
@@ -1474,7 +1488,7 @@ openssl ts -verify -data audit_bundle.txt -in swisssign.tsr → Verification: OK
 
 <footer>
  <div class="f-row"><span class="fk">Vérificateur public</span><span class="fv"><a class="klink" href="https://github.com/KAIROSSYSTEMSCH/KAIROS-VERIFIER" rel="noopener">https://github.com/KAIROSSYSTEMSCH/KAIROS-VERIFIER</a></span></div>
- <div class="f-row"><span class="fk">Outil de vérification</span><span class="fv">validation_externe.sh — <span class="hash">2a9ac46c…98065fce</span></span></div>
+ <div class="f-row"><span class="fk">Outil de vérification</span><span class="fv">validation_externe.sh — <span class="hash">bfb64ad5…c372f24fc</span></span></div>
  <div class="f-row"><span class="fk">Sécurité</span><span class="fv"><a class="klink" href="https://kairossystems.fr/.well-known/security.txt" rel="noopener">https://kairossystems.fr/.well-known/security.txt</a></span></div>
  <div class="f-row"><span class="fk">Contact</span><span class="fv">security@kairossystems.fr</span></div>
  <div class="f-row"><span class="fk">Dossier</span><span class="fv" style="font-weight:900;">Validation externe &amp; architecture de la preuve — v1.0 · 2026-07-24</span></div>
@@ -1586,20 +1600,22 @@ WORK="$HOME/kairos_verification"
 REPO="https://github.com/KAIROSSYSTEMSCH/KAIROS-VERIFIER.git"
 CSV_URL="https://deepchemdata.s3.us-west-1.amazonaws.com/datasets/BBBP.csv"
 
-SCRIPT_ATTENDU="f23de8df0d216dc6d79d0402103dcb2bb5ed1132eee83f10bf698c2cbae6d75c"
+SCRIPT_ATTENDU="e2f6cd4b4e67e98d19adbd76e9e8c12eae0276cca3755b324e55f3b966525be4"
 CSV_ATTENDU="d07a38487aeac5cee5508413e468043ef3097451d2a112701c2d60be9ec6b662"
 PARQUET_ATTENDU="4621ac8d5d4a728a169fb4d5b8c35682b954928a019d575e3eca140cd563489f"
 
-LADDER_ATTENDU="L0 1d9e01d16d638900
-L1 84af2aaa28305585
-L1b 9984517da6ef41ff
-L2 86ca842440c89f74
-L3 60da9d0bfeb7bb99
-L3b db791086e49a76e2
-L4 0bf4f040e2ee2721
-L4b 9d40cfbddb0c14ca
-L5 687b5cae54c0f69f
-L5b d36851807abf6013"
+LADDER_ATTENDU="L0 1d9e01d16d6389002d78dd1a6456743273cdf2277fd781c872bc428a567ef85b
+L1 84af2aaa28305585d54e02e8de41148d894fe66faadab54f38b3727c82e78580
+L1b 9984517da6ef41ff74b85274d57301e063b46dfbce4892ea3841b19800a6785f
+L2 86ca842440c89f745a9b4aa1b0c7972fa6879c055f334b867d7cfb1ccd233f4a
+L3 60da9d0bfeb7bb992dfa73ced6bb6634840be86783f20979e44bfcfbf8906fe9
+L3b db791086e49a76e2087927d7a010666707b3945fafb71b2446164d672a8c6872
+L4 0bf4f040e2ee2721aca6e3c74d20f74198cef85ca4bba4348a7152f00e44e9b3
+L4b 9d40cfbddb0c14caadec21c852b5d6578767fb14da59ad563a70bdc8b23dcb18
+L5 687b5cae54c0f69f4bf6c54bb60d737a27b1a2c9965e577c7846e462fe976703
+L5b d36851807abf6013acd4b7be2c66f25d3ec4e82d84b6e451bf84fc1beafd38d3
+L6_mono e05c0b80de5ce5e4f092d0de2277e40bebdee593d6fc1a8c96db8ceb03effaf6
+L6_multi e05c0b80de5ce5e4f092d0de2277e40bebdee593d6fc1a8c96db8ceb03effaf6"
 
 ATT="$WORK/ATTESTATION_DATA.txt"
 CONFORMES=0
@@ -1731,6 +1747,8 @@ etape "Étape 1 — récupération du vérificateur depuis le dépôt public"
 cmd "git clone $REPO"
 rm -rf "$WORK/KV"
 git clone -q "$REPO" "$WORK/KV" || abandon "Clone du dépôt impossible."
+(cd "$WORK/KV" && git checkout -q --detach 528f8595bb40c566ba49fb24386bc13869d913e9) || \
+  abandon "Le commit de référence est introuvable dans le dépôt cloné."
 OBT="$(sha256 "$WORK/KV/determinism_ladder.py")"
 note ""
 note "Empreinte du fichier téléchargé :"
@@ -1783,7 +1801,7 @@ P1_OK=0; P1_KO=0
 echo "--- Partie 1 : empreintes ---" >> "$ATT"
 while read -r niveau publie; do
   [ -z "$niveau" ] && continue
-  obtenu="$(awk -v n="$niveau" '$1==n { for(i=2;i<=NF;i++) if ($i ~ /^[0-9a-f]{16}$/) { print $i; exit } }' "$WORK/ladder.txt")"
+  obtenu="$(awk -v n="$niveau" '$1==n { for(i=2;i<=NF;i++) if ($i ~ /^[0-9a-f]{64}$/) { print $i; exit } }' "$WORK/ladder.txt")"
   [ -z "$obtenu" ] && obtenu="(non lu)"
   if [ "$publie" = "$obtenu" ]; then etat="identique"; P1_OK=$((P1_OK+1))
   else etat="DIFFÉRENT"; P1_KO=$((P1_KO+1)); fi
@@ -1791,20 +1809,6 @@ while read -r niveau publie; do
   echo "$niveau publie=$publie obtenu=$obtenu" >> "$ATT"
 done <<< "$LADDER_ATTENDU"
 
-L6VALS="$(awk '$1=="L6" { for(i=2;i<=NF;i++) if ($i ~ /^[0-9a-f]{16}$/) { print $i; break } }' "$WORK/ladder.txt")"
-i=0
-for v in $L6VALS; do
-  i=$((i+1))
-  if [ "$v" = "e05c0b80de5ce5e4" ]; then etat="identique"; P1_OK=$((P1_OK+1))
-  else etat="DIFFÉRENT"; P1_KO=$((P1_KO+1)); fi
-  printf '  %-5s publie e05c0b80de5ce5e4   obtenu %s   %s\n' "L6.$i" "$v" "$etat"
-  echo "L6 mesure $i : publie=e05c0b80de5ce5e4 obtenu=$v" >> "$ATT"
-done
-if [ "$i" -lt 2 ]; then
-  manque=$((2-i)); P1_KO=$((P1_KO+manque))
-  printf '  %-5s publie e05c0b80de5ce5e4   obtenu (non lu)   DIFFÉRENT\n' "L6"
-  echo "L6 : $manque mesure(s) non lue(s) — xgboost absent ou en echec" >> "$ATT"
-fi
 note ""
 note "  Partie 1 — $P1_OK empreintes identiques sur 12."
 echo "Partie 1 : $P1_OK identiques / 12" >> "$ATT"
@@ -1815,9 +1819,9 @@ note "  Le même calcul est relancé sans cette variable. Le résultat est"
 note "  consigné sans interprétation."
 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 PYTHONHASHSEED=0 \
 "$PY1" determinism_ladder.py > "$WORK/ladder_sans.txt" 2>/dev/null
-L3S="$(awk '$1=="L3" { for(i=2;i<=NF;i++) if ($i ~ /^[0-9a-f]{16}$/) { print $i; exit } }' "$WORK/ladder_sans.txt")"
+L3S="$(awk '$1=="L3" { for(i=2;i<=NF;i++) if ($i ~ /^[0-9a-f]{64}$/) { print $i; exit } }' "$WORK/ladder_sans.txt")"
 note ""
-note "  L3 avec la variable : $(awk '$1=="L3" { for(i=2;i<=NF;i++) if ($i ~ /^[0-9a-f]{16}$/) { print $i; exit } }' "$WORK/ladder.txt")"
+note "  L3 avec la variable : $(awk '$1=="L3" { for(i=2;i<=NF;i++) if ($i ~ /^[0-9a-f]{64}$/) { print $i; exit } }' "$WORK/ladder.txt")"
 note "  L3 sans la variable : ${L3S:-(non lu)}"
 { echo "--- Partie 1 : sans OPENBLAS_CORETYPE ---"
   echo "L3 sans OPENBLAS_CORETYPE : ${L3S:-non lu}"; } >> "$ATT"
@@ -2201,7 +2205,7 @@ document.querySelectorAll('pre.code').forEach(function(pre){
 
 var H={
  "1afe15f8":"1afe15f8a6b33d74b487d00acb49aaa07adb20a8a2ec93c22192ae4571a84e76",
- "2a9ac46c":"2a9ac46c838d16b1855babf17bf3172e4e3325619018a5c2b88ee0d798065fce",
+ "bfb64ad5":"bfb64ad5e5e793f11c55ffe0e48ea09e8f04a25d45bd1f04415df77c372f24fc",
  "3b51d1bf":"3b51d1bf970b1c98895a91d0a799507cf3a4fc544c2652c06f4d13c44c59e73e",
  "4621ac8d":"4621ac8d5d4a728a169fb4d5b8c35682b954928a019d575e3eca140cd563489f",
  "5200d0cd":"5200d0cdb4597394c0d40f4b75bb7365c216404c9522d4432b89f7d311709a81",
@@ -2225,7 +2229,7 @@ var H={
  "e482ba3c":"e482ba3c578f25f34719708237dd2898411a70cf351479a9b5425669bc7fea03",
  "e4c685ae":"e4c685aec2eb6480091e96aba0e39ba77b73406985bf5b0c85da355deb0d6da7",
  "ebb80d0b":"ebb80d0b9d8852e65d2995b78de725184eaff09b2391276dc8460b98c39b542a",
- "f23de8df":"f23de8df0d216dc6d79d0402103dcb2bb5ed1132eee83f10bf698c2cbae6d75c"};
+ "e2f6cd4b":"e2f6cd4b4e67e98d19adbd76e9e8c12eae0276cca3755b324e55f3b966525be4"};
 document.querySelectorAll('.hash').forEach(function(s){
   var t=s.textContent.trim(), k=t.slice(0,8).toLowerCase(), full=H[k]||(/^[0-9a-f]{16,64}$/.test(t)?t:null);
   if(!full) return;
