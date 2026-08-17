@@ -628,13 +628,13 @@ body.gate-locked > #gate-flash{visibility:visible;}
 <div class="dl">
   <div class="fn">validation_externe.sh</div>
   <div class="fr">Outil de vérification guidée. Code source lisible, licence Apache 2.0. N'installe rien hors du répertoire de travail, ne demande aucun droit administrateur, ne modifie aucun fichier système.</div>
-  <div class="fm"><span>SHA-256</span><span class="hash">bfb64ad5…c372f24fc</span><span>15 628 octets</span></div>
+  <div class="fm"><span>SHA-256</span><span class="hash">34dbeb14…c0eb750a9</span><span>16 052 octets</span></div>
   <button class="kbtn p" data-dl="f-script" data-name="validation_externe.sh">Télécharger l'outil</button>
 </div>
 
 <div class="sub-title red">Contrôle d'intégrité avant exécution</div>
 <p class="body-text">Le validateur vérifie que l'outil téléchargé correspond à l'empreinte déclarée ci-dessous avant de l'exécuter.</p>
-<div class="big">bfb64ad5e5e793f11c55ffe0e48ea09e8f04a25d45bd1f04415df77c372f24fc</div>
+<div class="big">34dbeb1490c371f29aed1ddce3264096e47818d183f97be8333e95fc0eb750a9</div>
 <pre class="code">sha256sum validation_externe.sh      # Linux
 shasum -a 256 validation_externe.sh  # macOS</pre>
 <p class="body-text">Si l'empreinte diffère, le fichier n'est pas celui décrit par le présent document: ne pas l'exécuter, et le signaler à l'adresse figurant au paragraphe 09.</p>
@@ -1488,7 +1488,7 @@ openssl ts -verify -data audit_bundle.txt -in swisssign.tsr → Verification: OK
 
 <footer>
  <div class="f-row"><span class="fk">Vérificateur public</span><span class="fv"><a class="klink" href="https://github.com/KAIROSSYSTEMSCH/KAIROS-VERIFIER" rel="noopener">https://github.com/KAIROSSYSTEMSCH/KAIROS-VERIFIER</a></span></div>
- <div class="f-row"><span class="fk">Outil de vérification</span><span class="fv">validation_externe.sh — <span class="hash">bfb64ad5…c372f24fc</span></span></div>
+ <div class="f-row"><span class="fk">Outil de vérification</span><span class="fv">validation_externe.sh — <span class="hash">34dbeb14…c0eb750a9</span></span></div>
  <div class="f-row"><span class="fk">Sécurité</span><span class="fv"><a class="klink" href="https://kairossystems.fr/.well-known/security.txt" rel="noopener">https://kairossystems.fr/.well-known/security.txt</a></span></div>
  <div class="f-row"><span class="fk">Contact</span><span class="fv">security@kairossystems.fr</span></div>
  <div class="f-row"><span class="fk">Dossier</span><span class="fv" style="font-weight:900;">Validation externe &amp; architecture de la preuve — v1.0 · 2026-07-24</span></div>
@@ -1590,13 +1590,15 @@ SIGNATURE
 #
 # Plateformes : Linux x86_64 · macOS x86_64 · macOS arm64
 # Usage       : bash validation_externe.sh
-# Effacer     : rm -rf ~/kairos_verification
+# Espace      : KAIROS_WORKDIR=/chemin bash validation_externe.sh  (optionnel,
+#               défaut ~/kairos_verification)
+# Effacer     : rm -rf "${KAIROS_WORKDIR:-~/kairos_verification}"
 #
 # Licence Apache 2.0 — Aether Paris SAS / Kairos Systems
 # =============================================================================
 set -u
 
-WORK="$HOME/kairos_verification"
+WORK="${KAIROS_WORKDIR:-$HOME/kairos_verification}"
 REPO="https://github.com/KAIROSSYSTEMSCH/KAIROS-VERIFIER.git"
 CSV_URL="https://deepchemdata.s3.us-west-1.amazonaws.com/datasets/BBBP.csv"
 
@@ -1646,8 +1648,16 @@ pyver_ok() { # 0 si python3 est dans l'enveloppe mesuree 3.10 a 3.12
 }
 get_micromamba() {
   [ -x "$WORK/bin/micromamba" ] && return 0
-  mkdir -p "$WORK" && cd "$WORK" || return 1
-  curl -Ls "https://micro.mamba.pm/api/micromamba/${MAMBA_PLAT}/latest" | tar -xj bin/micromamba >/dev/null 2>&1
+  mkdir -p "$WORK/bin" && cd "$WORK" || return 1
+  local url="https://github.com/mamba-org/micromamba-releases/releases/download/2.0.5-0/micromamba-${MAMBA_PLAT}"
+  local tentative
+  for tentative in 1 2 3; do
+    curl -Ls -f -o "$WORK/bin/micromamba" "$url" && break
+    sleep 2
+  done
+  [ -s "$WORK/bin/micromamba" ] || return 1
+  chmod +x "$WORK/bin/micromamba"
+  "$WORK/bin/micromamba" --version >/dev/null 2>&1
 }
 
 # ---------- présentation ----------
@@ -2205,7 +2215,7 @@ document.querySelectorAll('pre.code').forEach(function(pre){
 
 var H={
  "1afe15f8":"1afe15f8a6b33d74b487d00acb49aaa07adb20a8a2ec93c22192ae4571a84e76",
- "bfb64ad5":"bfb64ad5e5e793f11c55ffe0e48ea09e8f04a25d45bd1f04415df77c372f24fc",
+ "34dbeb14":"34dbeb1490c371f29aed1ddce3264096e47818d183f97be8333e95fc0eb750a9",
  "3b51d1bf":"3b51d1bf970b1c98895a91d0a799507cf3a4fc544c2652c06f4d13c44c59e73e",
  "4621ac8d":"4621ac8d5d4a728a169fb4d5b8c35682b954928a019d575e3eca140cd563489f",
  "5200d0cd":"5200d0cdb4597394c0d40f4b75bb7365c216404c9522d4432b89f7d311709a81",
