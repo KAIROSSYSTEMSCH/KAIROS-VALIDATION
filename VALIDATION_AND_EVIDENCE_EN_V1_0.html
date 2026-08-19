@@ -1,0 +1,2312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KAIROS — External Validation &amp; Evidence Architecture</title>
+<style>
+
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{ --black:#000; --white:#fff; --red:#FF0000; --gray:#BBBBBB; --gd:#888888; --gm:#222; }
+html,body{background:var(--black);color:var(--white);font-family:'Inter',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+::selection{background:var(--red);color:#fff;}
+
+#topbar{
+  position:sticky; top:0; z-index:50;
+  background:rgba(0,0,0,.96);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 40px;
+}
+#topbar .lbl-left{font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--red);}
+#topbar .lbl-right{font-family:'Inter',-apple-system,sans-serif;font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--white);}
+
+#progress{position:fixed;top:0;left:0;height:2px;background:var(--red);z-index:60;width:0%;}
+
+.page{ max-width:760px; margin:0 auto; padding:36px 56px 50px; }
+.cover{margin-bottom:32px;}
+.cover .k-eyebrow{font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--red);margin-bottom:10px;}
+.cover h1{font-size:clamp(26px,3.4vw,38px);font-weight:900;letter-spacing:-.015em;text-transform:uppercase;line-height:1.05;color:var(--white);margin-bottom:10px;}
+.cover .objet{font-size:13px;line-height:1.4;color:var(--white);font-weight:700;margin-bottom:16px;max-width:640px;}
+.meta{display:grid;grid-template-columns:150px 1fr;row-gap:6px;column-gap:14px;margin-top:14px;padding-top:12px;border-top:1px solid var(--gm);}
+.meta .mk{font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red);padding-top:1px;}
+.meta .mv{font-size:11.5px;font-weight:700;text-transform:uppercase;color:var(--white);line-height:1.35;}
+.meta .mv .sub{font-weight:700;color:var(--white);margin-top:1px;}
+.meta .mv .sub2{font-weight:700;color:var(--white);margin-top:1px;}
+
+section{margin-top:30px;}
+.sec-eyebrow{display:flex;align-items:baseline;gap:9px;margin-bottom:8px;}
+.sec-num{font-size:16px;font-weight:900;color:var(--red);letter-spacing:.06em;}
+.sec-title{font-size:16px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;color:var(--white);}
+.sec-title.red{color:var(--red);}
+.sec-rule{height:1px;background:var(--red);opacity:.55;margin-bottom:12px;}
+.sub-title{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--white);margin:13px 0 5px;}
+.sub-title.red{color:var(--red);}
+.sub-title:first-child{margin-top:0;}
+
+.pg{margin-bottom:7px;}
+.mv br{content:"";display:block;margin-top:1px;}
+.pg p{font-size:13px;line-height:1.35;color:var(--white);margin-bottom:0px;font-weight:700;}
+.pg p:last-child{margin-bottom:0;}
+p.body-text{font-size:13px;line-height:1.4;color:var(--white);font-weight:700;margin-bottom:7px;}
+p.body-text:last-child{margin-bottom:0;}
+p.body-text b{font-weight:800;}
+
+blockquote{ border-left:2px solid var(--red); padding:1px 0 1px 14px; margin:7px 0;
+  font-size:12.5px; font-style:italic; color:var(--white); line-height:1.4; font-weight:700; }
+
+table.kt{width:100%;border-collapse:collapse;margin:7px 0 12px;table-layout:fixed;}
+table.kt th{ text-align:left; font-size:9px; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--red); padding:0 14px 6px 0; border-bottom:1px solid rgba(255,0,0,.55); }
+table.kt td{ font-size:12px; color:var(--white); font-weight:700; line-height:1.35; padding:8px 14px 8px 0;
+  vertical-align:top; word-wrap:break-word; }
+table.kt tr td:first-child{font-weight:800; text-transform:uppercase; letter-spacing:.02em; color:var(--white); padding-right:16px;}
+table.kt tbody tr{border-top:1px solid rgba(255,255,255,.06);}
+table.kt tbody tr:first-child{border-top:none;}
+table.kt td .l2{display:block;font-weight:600;color:var(--white);text-transform:none;margin-top:1px;}
+.nowrap{white-space:nowrap;}
+
+pre.code{ background:#0a0a0a; border-left:2px solid var(--red); padding:10px 14px; margin:7px 0;
+  font-family:'SFMono-Regular',Consolas,monospace; font-size:11px; line-height:1.45; color:var(--gray);
+  white-space:pre-wrap; word-break:break-word; overflow-wrap:break-word; font-weight:500; }
+pre.code .hl{color:var(--white);}
+.hash{font-family:Consolas,monospace;color:var(--gray);font-size:.96em;word-break:break-all;font-weight:500;}
+
+.kv{margin:7px 0 12px;}
+.kv .row{display:grid;grid-template-columns:180px 1fr;gap:1px 16px;padding:6px 0;border-top:1px solid rgba(255,255,255,.06);}
+.kv .row:first-child{border-top:none;}
+.kv .k{font-size:9.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--red);}
+.kv .v{font-size:12px;color:var(--white);font-weight:700;line-height:1.35;}
+
+.doc-tech-flag{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:6px;}
+
+footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--red);}
+footer .f-row{display:grid;grid-template-columns:160px 1fr;gap:14px;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;line-height:1.3;}
+footer .f-row .fk{color:var(--red);}
+footer .f-row .fv{color:var(--white);font-weight:800;}
+footer .f-row .fv a.klink{font-family:inherit;font-size:inherit;}
+footer .f-row .fv .hash{font-family:inherit;color:inherit;font-size:inherit;font-weight:inherit;letter-spacing:inherit;}
+.f-row .fv a.klink{font-weight:800;color:var(--white);}
+
+#ks-grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.026;}
+
+
+/* ===== HARMONISATION KAIROS ===== */
+/* colonne gauche des tableaux = taille des en-têtes */
+table.kt tbody tr td:first-child,table.kt tbody tr td:first-child *{
+  font-size:9px!important;letter-spacing:.1em!important;line-height:1.5!important;}
+/* interligne du texte courant, aligné sur le site */
+p.body-text,.pg p,.cover .objet{line-height:1.45;}
+li{line-height:1.45;}
+/* micro-titres rouges : pas d'air avec le texte dessous */
+.sub-title.red{color:var(--red);margin:12px 0 0;}
+.sub-title.red+p,.sub-title.red+.pg,.sub-title.red+.cwrap,.sub-title.red+table.kt,
+.sub-title.red+pre.code,.sub-title.red+.kv{margin-top:0;}
+.sub-title.red+.cwrap pre.code,.sub-title.red+pre.code{margin-top:2px;}
+/* ancres */
+section[id]{scroll-margin-top:56px;}
+.sec-eyebrow .plink{opacity:0;text-decoration:none;color:var(--gd);
+  font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;margin-left:6px;}
+.sec-eyebrow:hover .plink,.plink:focus{opacity:1;}
+.plink:hover{color:var(--red);}
+/* liens actifs */
+a.klink{color:var(--white);text-decoration:none;font-family:Consolas,monospace;
+  font-size:.96em;font-weight:500;word-break:break-all;}
+a.klink:hover{color:var(--red);}
+/* copie */
+.cwrap{position:relative;}
+.cbtn{position:absolute;top:6px;right:6px;width:22px;height:20px;padding:0;
+  border:1px solid var(--gm);background:#0a0a0a;color:var(--gd);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;opacity:.55;}
+.cwrap:hover .cbtn,.cbtn:focus{opacity:1;}
+.cbtn:hover{color:var(--red);border-color:var(--red);}
+.cbtn.ok{color:var(--red);border-color:var(--red);opacity:1;}
+.hash.cp{cursor:pointer;border-bottom:1px dotted var(--gd);}
+.hash.cp:hover{color:var(--white);border-bottom-color:var(--red);}
+.hash.cp.ok{color:var(--red);border-bottom-color:var(--red);}
+/* retour en haut */
+#ktop{position:fixed;right:14px;bottom:14px;width:30px;height:30px;z-index:55;
+  border:1px solid var(--gray);background:var(--black);color:var(--gray);
+  display:none;align-items:center;justify-content:center;cursor:pointer;}
+#ktop.show{display:flex;}
+#ktop:hover{color:var(--red);border-color:var(--red);}
+/* impression */
+@media print{
+  #topbar,#progress,#ks-grain,#ktop,.cbtn{display:none!important;}
+  html,body{background:#fff;color:#000;}
+  .page{max-width:none;padding:0;}
+  p.body-text,.pg p,table.kt td{color:#111;}
+  .sec-title,.sub-title,table.kt tr td:first-child{color:#000;}
+  .sec-num,.sec-rule,table.kt th,.sub-title.red{color:#FF0000;}
+  .sec-rule{background:#FF0000;}
+  pre.code{background:#f4f4f4;color:#111;border-left:2px solid #FF0000;}
+  pre.code .hl{color:#000;} .hash{color:#333;}
+  section,table.kt,pre.code{break-inside:avoid;page-break-inside:avoid;}
+  a{color:#000;text-decoration:none;}
+}
+
+p.plabel{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin:12px 0 0;}
+p.plabel+p,p.plabel+.pg,p.plabel+.cwrap,p.plabel+table.kt,p.plabel+pre.code{margin-top:0;}
+p.plabel+.cwrap pre.code,p.plabel+pre.code{margin-top:2px;}
+blockquote .qlabel{display:block;font-size:11px;font-weight:800;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--red);margin-bottom:2px;}
+
+/* ===== SPÉCIFIQUE VALIDATION EXTERNE ===== */
+.step{border-left:1px solid var(--gm);margin:14px 0;padding-left:15px;}
+.step>header{display:flex;align-items:baseline;gap:10px;margin-bottom:5px;}
+.step .n{font-family:'SFMono-Regular',Consolas,monospace;font-size:13px;font-weight:900;color:var(--red);}
+.step h4{margin:0;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--white);}
+.dl{border:1px solid var(--gm);background:#0a0a0a;padding:13px 14px;margin:10px 0;}
+.dl .fn{font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;font-weight:700;color:var(--white);}
+.dl .fr{font-size:11.5px;line-height:1.45;color:var(--gd);font-weight:600;margin:4px 0 7px;}
+.dl .fm{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-family:'SFMono-Regular',Consolas,monospace;font-size:10px;color:var(--gd);margin-bottom:8px;}
+.kbtn{display:inline-flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:6px 12px;border:1px solid var(--gray);background:transparent;color:var(--white);text-decoration:none;cursor:pointer;}
+.kbtn:hover{border-color:var(--red);color:var(--red);}
+.kbtn.p{background:var(--red);border-color:var(--red);color:var(--white);}
+.kbtn.p:hover{background:var(--white);border-color:var(--white);color:var(--black);}
+.att{border:1px solid var(--gm);padding:16px 18px;margin:12px 0;background:#050505;}
+.att .fld{display:grid;grid-template-columns:210px 1fr;gap:3px 14px;font-size:12px;margin:3px 0;align-items:baseline;}
+.att .fld span:first-child{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--red);}
+.att .line{border-bottom:1px solid var(--gm);min-height:15px;}
+.att h5{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--white);margin:16px 0 6px;border-bottom:1px solid var(--gm);padding-bottom:4px;}
+.att .chk{font-size:12px;color:var(--gray);margin:3px 0;}
+.cwrap{position:relative;}
+.cbtn{position:absolute;top:6px;right:6px;width:22px;height:20px;padding:0;border:1px solid var(--gm);background:#0a0a0a;color:var(--gd);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.55;}
+.cwrap:hover .cbtn,.cbtn:focus{opacity:1;}
+.cbtn:hover{color:var(--red);border-color:var(--red);}
+.cbtn.ok{color:var(--red);border-color:var(--red);opacity:1;}
+.hash.cp{cursor:pointer;border-bottom:1px dotted var(--gd);}
+.hash.cp:hover{color:var(--white);border-bottom-color:var(--red);}
+.hash.cp.ok{color:var(--red);border-bottom-color:var(--red);}
+.big{font-family:'SFMono-Regular',Consolas,monospace;font-size:12.5px;color:var(--white);background:#0a0a0a;border-left:2px solid var(--red);padding:11px 14px;margin:8px 0;word-break:break-all;}
+@media print{
+  #topbar,#progress,#ks-grain,.cbtn,.kbtn{display:none!important;}
+  html,body{background:#fff;color:#000;}
+  .page{max-width:none;padding:0;}
+  p.body-text,.pg p,table.kt td,.dl .fr,.att .chk{color:#111;}
+  .sec-title,.sub-title,.step h4,.dl .fn,table.kt tr td:first-child{color:#000;}
+  .sec-num,.sec-rule,table.kt th,.sub-title.red,.plabel,.step .n,.att .fld span:first-child{color:#FF0000;}
+  .sec-rule{background:#FF0000;}
+  pre.code,.big{background:#f4f4f4;color:#111;border-left:2px solid #FF0000;}
+  pre.code .hl{color:#000;} .hash{color:#333;}
+  .dl,.att,.step{border-color:#bbb;background:#fff;}
+  section,table.kt,pre.code,.dl,.att,.step{break-inside:avoid;page-break-inside:avoid;}
+  a{color:#000;text-decoration:none;}
+}
+
+
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{ --black:#000; --white:#fff; --red:#FF0000; --gray:#BBBBBB; --gd:#888888; --gm:#222; }
+html,body{background:var(--black);color:var(--white);font-family:'Inter',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+::selection{background:var(--red);color:#fff;}
+
+#topbar{
+  position:sticky; top:0; z-index:50;
+  background:rgba(0,0,0,.96);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 40px;
+}
+#topbar .lbl-left{font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--red);}
+#topbar .lbl-right{font-family:'Inter',-apple-system,sans-serif;font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--white);}
+
+#progress{position:fixed;top:0;left:0;height:2px;background:var(--red);z-index:60;width:0%;}
+
+.page{ max-width:760px; margin:0 auto; padding:36px 56px 50px; }
+.cover{margin-bottom:32px;}
+.cover .k-eyebrow{font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--red);margin-bottom:10px;}
+.cover h1{font-size:clamp(26px,3.4vw,38px);font-weight:900;letter-spacing:-.015em;text-transform:uppercase;line-height:1.05;color:var(--white);margin-bottom:10px;}
+.cover .objet{font-size:13px;line-height:1.4;color:var(--white);font-weight:700;margin-bottom:16px;max-width:640px;}
+.meta{display:grid;grid-template-columns:150px 1fr;row-gap:6px;column-gap:14px;margin-top:14px;padding-top:12px;border-top:1px solid var(--gm);}
+.meta .mk{font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red);padding-top:1px;}
+.meta .mv{font-size:11.5px;font-weight:700;text-transform:uppercase;color:var(--white);line-height:1.35;}
+.meta .mv .sub{font-weight:700;color:var(--white);margin-top:1px;}
+.meta .mv .sub2{font-weight:700;color:var(--white);margin-top:1px;}
+
+section{margin-top:30px;}
+.sec-eyebrow{display:flex;align-items:baseline;gap:9px;margin-bottom:8px;}
+.sec-num{font-size:16px;font-weight:900;color:var(--red);letter-spacing:.06em;}
+.sec-title{font-size:16px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;color:var(--white);}
+.sec-title.red{color:var(--red);}
+.sec-rule{height:1px;background:var(--red);opacity:.55;margin-bottom:12px;}
+.sub-title{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--white);margin:13px 0 5px;}
+.sub-title.red{color:var(--red);}
+.sub-title:first-child{margin-top:0;}
+
+.pg{margin-bottom:7px;}
+.mv br{content:"";display:block;margin-top:1px;}
+.pg p{font-size:13px;line-height:1.35;color:var(--white);margin-bottom:0px;font-weight:700;}
+.pg p:last-child{margin-bottom:0;}
+p.body-text{font-size:13px;line-height:1.4;color:var(--white);font-weight:700;margin-bottom:7px;}
+p.body-text:last-child{margin-bottom:0;}
+p.body-text b{font-weight:800;}
+
+blockquote{ border-left:2px solid var(--red); padding:1px 0 1px 14px; margin:7px 0;
+  font-size:12.5px; font-style:italic; color:var(--white); line-height:1.4; font-weight:700; }
+
+table.kt{width:100%;border-collapse:collapse;margin:7px 0 12px;table-layout:fixed;}
+table.kt th{ text-align:left; font-size:9px; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--red); padding:0 14px 6px 0; border-bottom:1px solid rgba(255,0,0,.55); }
+table.kt td{ font-size:12px; color:var(--white); font-weight:700; line-height:1.35; padding:8px 14px 8px 0;
+  vertical-align:top; word-wrap:break-word; }
+table.kt tr td:first-child{font-weight:800; text-transform:uppercase; letter-spacing:.02em; color:var(--white); padding-right:16px;}
+table.kt tbody tr{border-top:1px solid rgba(255,255,255,.06);}
+table.kt tbody tr:first-child{border-top:none;}
+table.kt td .l2{display:block;font-weight:600;color:var(--white);text-transform:none;margin-top:1px;}
+.nowrap{white-space:nowrap;}
+
+pre.code{ background:#0a0a0a; border-left:2px solid var(--red); padding:10px 14px; margin:7px 0;
+  font-family:'SFMono-Regular',Consolas,monospace; font-size:11px; line-height:1.45; color:var(--gray);
+  white-space:pre-wrap; word-break:break-word; overflow-wrap:break-word; font-weight:500; }
+pre.code .hl{color:var(--white);}
+.hash{font-family:Consolas,monospace;color:var(--gray);font-size:.96em;word-break:break-all;font-weight:500;}
+
+.kv{margin:7px 0 12px;}
+.kv .row{display:grid;grid-template-columns:180px 1fr;gap:1px 16px;padding:6px 0;border-top:1px solid rgba(255,255,255,.06);}
+.kv .row:first-child{border-top:none;}
+.kv .k{font-size:9.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--red);}
+.kv .v{font-size:12px;color:var(--white);font-weight:700;line-height:1.35;}
+
+.doc-tech-flag{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:6px;}
+
+footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--red);}
+footer .f-row{display:grid;grid-template-columns:160px 1fr;gap:14px;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;line-height:1.3;}
+footer .f-row .fk{color:var(--red);}
+footer .f-row .fv{color:var(--white);font-weight:800;}
+footer .f-row .fv a.klink{font-family:inherit;font-size:inherit;}
+footer .f-row .fv .hash{font-family:inherit;color:inherit;font-size:inherit;font-weight:inherit;letter-spacing:inherit;}
+
+#ks-grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.026;}
+
+
+section,footer{position:relative;z-index:2;}
+
+/* ============ MENU INTERACTIF ============ */
+#kmenu{margin:18px 0 6px;border-top:1px solid var(--gm);border-bottom:1px solid var(--gm);padding:12px 0;}
+#kmenu .mhead{display:flex;align-items:baseline;gap:10px;margin-bottom:9px;}
+#kmenu .mlab{font-size:9.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--red);}
+#kmenu .mcount{font-family:'SFMono-Regular',Consolas,monospace;font-size:9.5px;color:var(--gd);}
+#kmenu .mfilter{margin-left:auto;}
+#kmenu input{background:#0a0a0a;border:1px solid var(--gm);color:var(--white);
+  font-family:'SFMono-Regular',Consolas,monospace;font-size:10px;padding:3px 8px;width:150px;}
+#kmenu input::placeholder{color:var(--gd);letter-spacing:.1em;text-transform:uppercase;font-size:9px;}
+#kmenu input:focus{outline:none;border-color:var(--red);}
+#kmenu .mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1px 18px;}
+#kmenu a{display:flex;align-items:baseline;gap:8px;padding:3px 0;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.05);}
+#kmenu a:hover{border-bottom-color:var(--red);}
+#kmenu a .mn{font-family:'SFMono-Regular',Consolas,monospace;font-size:9.5px;font-weight:800;color:var(--red);min-width:34px;}
+#kmenu a .mt{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--gray);}
+#kmenu a:hover .mt{color:var(--white);}
+#kmenu a.hide{display:none;}
+#kmenu .mnone{display:none;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gd);padding:4px 0;}
+
+/* ============ ANCRES ============ */
+section[id]{scroll-margin-top:60px;}
+.sec-eyebrow .plink{opacity:0;text-decoration:none;color:var(--gd);font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;margin-left:6px;}
+.sec-eyebrow:hover .plink,.plink:focus{opacity:1;}
+.plink:hover{color:var(--red);}
+section.flash{animation:kflash 1.3s ease;}
+@keyframes kflash{0%{background:rgba(255,0,0,.10);}100%{background:transparent;}}
+
+/* ============ COPIE ============ */
+.cwrap{position:relative;}
+.cbtn{position:absolute;top:6px;right:6px;width:22px;height:20px;padding:0;
+  border:1px solid var(--gm);background:#0a0a0a;color:var(--gd);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;opacity:.55;}
+.cwrap:hover .cbtn,.cbtn:focus{opacity:1;}
+.cbtn:hover{color:var(--red);border-color:var(--red);}
+.cbtn.ok{color:var(--red);border-color:var(--red);opacity:1;}
+.hash.cp{cursor:pointer;border-bottom:1px dotted var(--gd);}
+.hash.cp:hover{color:var(--white);border-bottom-color:var(--red);}
+.hash.cp.ok{color:var(--red);border-bottom-color:var(--red);}
+
+/* ============ CHAÎNE DE PREUVE ============ */
+.kchain{border:1px solid var(--gm);background:#0a0a0a;padding:14px 10px;margin:7px 0 12px;overflow-x:auto;}
+.kchain svg{display:block;margin:0 auto;max-width:100%;height:auto;}
+.kchain .cn{cursor:pointer;}
+.kchain .cn rect{fill:var(--black);stroke:var(--gd);stroke-width:1;}
+.kchain .cn:hover rect,.kchain .cn:focus rect{stroke:var(--red);fill:rgba(255,0,0,.08);}
+.kchain .cn:focus{outline:none;}
+.kchain .st{fill:var(--red);font:800 8px 'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;}
+.kchain .lb{fill:var(--white);font:800 11.5px 'Inter',sans-serif;}
+.kchain .hs{fill:var(--gd);font:10px 'SFMono-Regular',Consolas,monospace;}
+.kchain .ln{stroke:var(--gd);stroke-width:1;}
+.kchain .pl{fill:var(--red);font:900 12px 'SFMono-Regular',Consolas,monospace;}
+
+/* ============ CARTES ARTEFACTS ============ */
+.kfiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:10px;margin:7px 0 12px;}
+.kf{border:1px solid var(--gm);background:#0a0a0a;padding:10px 11px;display:flex;flex-direction:column;gap:6px;}
+.kf:hover{border-color:rgba(255,0,0,.55);}
+.kf .fn{font-family:'SFMono-Regular',Consolas,monospace;font-size:11px;font-weight:700;color:var(--white);word-break:break-all;}
+.kf .fr{font-size:10.5px;line-height:1.35;color:var(--gd);font-weight:600;flex:1;}
+.kf .fm{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  font-family:'SFMono-Regular',Consolas,monospace;font-size:9.5px;color:var(--gd);}
+.ktag{font-size:8px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:1px 5px;border:1px solid var(--gd);color:var(--gd);}
+.ktag.mit{color:var(--white);border-color:var(--white);}
+.ktag.ext{color:var(--red);border-color:var(--red);}
+.kbtn{display:inline-flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;
+  font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  padding:5px 10px;border:1px solid var(--gray);background:transparent;color:var(--white);
+  text-decoration:none;cursor:pointer;align-self:flex-start;}
+.kbtn:hover{border-color:var(--red);color:var(--red);}
+.kbtn.p{background:var(--red);border-color:var(--red);color:var(--white);}
+.kbtn.p:hover{background:var(--white);border-color:var(--white);color:var(--black);}
+
+/* ============ RETOUR EN HAUT ============ */
+#ktop{position:fixed;right:14px;bottom:14px;width:30px;height:30px;z-index:55;
+  border:1px solid var(--gray);background:var(--black);color:var(--gray);
+  display:none;align-items:center;justify-content:center;cursor:pointer;}
+#ktop.show{display:flex;}
+#ktop:hover{color:var(--red);border-color:var(--red);}
+
+/* ============ IMPRESSION ============ */
+@media print{
+  #topbar,#progress,#ks-grain,#ktop,.cbtn,#kmenu .mfilter,.kbtn{display:none!important;}
+  html,body{background:#fff;color:#000;}
+  .page{max-width:none;padding:0;}
+  p.body-text,.pg p,table.kt td,.kf .fr{color:#111;}
+  .sec-title,.sub-title,table.kt tr td:first-child{color:#000;}
+  .sec-num,.sec-rule,table.kt th,.kv .k,#kmenu .mlab,footer .f-row .fk{color:#FF0000;}
+  .sec-rule{background:#FF0000;}
+  pre.code{background:#f4f4f4;color:#111;border-left:2px solid #FF0000;}
+  pre.code .hl{color:#000;}
+  .hash{color:#333;}
+  .kf,.kchain,#kmenu{background:#fff;border-color:#bbb;}
+  .kchain .cn rect{fill:#fff;stroke:#666;} .kchain .lb{fill:#000;} .kchain .hs{fill:#555;}
+  section,table.kt,pre.code,.kf,.kchain{break-inside:avoid;page-break-inside:avoid;}
+  a{color:#000;text-decoration:none;}
+}
+
+/* ===== CORRECTIFS D'HARMONISATION ===== */
+/* menu : blanc, chiffre au-dessus, une seule ligne */
+#kmenu .mgrid{display:block;}
+#kmenu a{display:flex;align-items:baseline;gap:10px;padding:3px 0;
+  border-bottom:1px solid rgba(255,255,255,.05);}
+#kmenu a .mn{flex:0 0 34px;font-size:9.5px;letter-spacing:.08em;white-space:nowrap;}
+#kmenu a .mt{color:var(--white);font-size:10.5px;font-weight:800;letter-spacing:.06em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;}
+#kmenu a:hover .mt{color:var(--red);}
+
+/* chaîne : capitales même taille, gris à la taille des hash, sceau en rouge */
+.kchain{padding:12px 8px;}
+.kchain .st{fill:var(--red);font:800 8px 'Inter',sans-serif;letter-spacing:.12em;text-transform:uppercase;}
+.kchain .lb{fill:var(--white);font:800 8px 'Inter',sans-serif;letter-spacing:.12em;text-transform:uppercase;}
+.kchain .hs{fill:var(--gray);font:500 8px Consolas,'SFMono-Regular',monospace;}
+.kchain .sealr{fill:var(--red);font:700 8px 'Inter',sans-serif;}
+.kchain .cn rect{stroke:none;fill:transparent;}
+.kchain .cn:hover rect,.kchain .cn:focus rect{fill:rgba(255,0,0,.10);}
+.kchain .arw{fill:var(--white);font:9px 'SFMono-Regular',Consolas,monospace;}
+.kchain .pl{font:900 11px Consolas,monospace;}
+
+/* tableaux : colonne de gauche à la taille des en-têtes */
+table.kt tbody tr td:first-child,table.kt tbody tr td:first-child *{
+  font-size:9px!important;letter-spacing:.1em!important;line-height:1.5!important;}
+
+/* micro-labels rouges */
+p.plabel{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--red);margin:13px 0 5px;}
+p.plabel+p,p.plabel+.pg{margin-top:0;}
+
+/* liens actifs */
+a.klink{color:var(--white);text-decoration:none;border-bottom:1px solid rgba(255,0,0,.55);
+  font-family:'SFMono-Regular',Consolas,monospace;font-size:.96em;font-weight:500;word-break:break-all;}
+a.klink:hover{color:var(--red);border-bottom-color:var(--red);}
+
+/* diagramme ASCII : lisible en blanc */
+pre.code.diag{color:var(--white);}
+
+/* gras homogène dans les cellules */
+table.kt td .l2{font-weight:600;}
+
+/* ===== ESPACEMENT DES MICRO-TITRES ROUGES ===== */
+.sub-title.red{margin:12px 0 0;}
+.sub-title.red+p,.sub-title.red+.pg,.sub-title.red+.cwrap,.sub-title.red+table.kt,
+.sub-title.red+pre.code,.sub-title.red+.kfiles,.sub-title.red+.kv{margin-top:0;}
+.sub-title.red+.cwrap pre.code,.sub-title.red+pre.code{margin-top:2px;}
+.sub-title.red+p.body-text,.sub-title.red+.pg p{margin-top:0;}
+p.plabel{margin:12px 0 0;}
+p.plabel+p,p.plabel+.pg,p.plabel+.cwrap,p.plabel+table.kt,p.plabel+pre.code{margin-top:0;}
+p.plabel+.cwrap pre.code,p.plabel+pre.code{margin-top:2px;}
+.pg p.plabel+p{margin-top:0;}
+
+/* ===== LIEN : pas de soulignement ===== */
+a.klink{border-bottom:none;}
+a.klink:hover{color:var(--red);border-bottom:none;}
+
+/* ===== BLOCS .pg : valeurs à la taille du micro-titre ===== */
+.pg.vals p.plabel ~ p{font-size:11px;letter-spacing:.02em;line-height:1.5;margin:0;}
+.pg.vals p.plabel ~ p .hash{font-size:11px;}
+
+/* ===== INTERLIGNE DU TEXTE COURANT — aligné sur le site Kairos ===== */
+p.body-text,.pg p:not(.plabel){line-height:1.45;}
+li{line-height:1.45;}
+
+/* nom de fichier tenant sur une ligne */
+.kf .fn.one{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;word-break:normal;font-size:10px;}
+/* titre d'objet en rouge */
+.objet .objet-t{color:var(--red);}
+
+
+/* ===== FUSION A+B — sommaire : colonne des numéros élargie ===== */
+#kmenu a .mn{flex:0 0 62px!important;min-width:62px!important;}
+#kmenu .mgrid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));}
+/* ===== FUSION A+B — titre sur deux lignes ===== */
+.cover h1 .t1,.cover h1 .t2{display:block;}
+.cover h1 .t2{color:var(--white);}
+/* ===== FUSION A+B — About sous le titre ===== */
+.about-top{margin:2px 0 14px;padding-bottom:12px;border-bottom:1px solid var(--gm);}
+.about-top p.body-text{font-size:12.5px;line-height:1.45;}
+.about-top p.body-text:last-child{margin-bottom:0;}
+/* ===== FUSION A+B — objet en capitales ===== */
+.objet .objet-t{text-transform:uppercase;letter-spacing:.1em;font-size:11px;}
+/* ===== FUSION A+B — intro de couverture ===== */
+.intro-parts{margin-top:8px;}
+.intro-parts p{font-size:13px;line-height:1.45;font-weight:700;color:var(--white);margin:0;}
+.intro-parts p.ip-t{color:var(--red);font-weight:900;letter-spacing:.04em;margin-top:9px;}
+.intro-parts p.ip-t:first-child{margin-top:0;}
+/* ===== FUSION A+B — footer : valeurs en gras ===== */
+footer .f-row .fv,footer .f-row .fv a.klink{font-weight:800;}
+/* ===== FUSION A+B — bouton de téléchargement pleine largeur ===== */
+.dl-wide{margin:12px 0 4px;}
+.kbtn-wide{display:block;width:100%;padding:13px 16px;border:none;cursor:pointer;
+  background:var(--red);color:#fff;font-family:'Inter',-apple-system,sans-serif;
+  font-size:11px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;
+  text-align:center;transition:opacity .15s;}
+.kbtn-wide:hover{opacity:.82;}
+.kbtn-wide:active{opacity:.7;}
+/* ===== FUSION A+B — séparateurs de partie ===== */
+.partsep{margin-top:46px;}
+.part-eyebrow{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
+.part-l{font-size:10px;font-weight:900;letter-spacing:.22em;text-transform:uppercase;color:var(--red);}
+.part-t{font-size:20px;font-weight:900;letter-spacing:-.01em;text-transform:uppercase;color:var(--white);}
+.part-rule{height:2px;background:var(--red);margin-bottom:10px;}
+
+/* ══ PASSWORD GATE ══════════════════════════════════════════ */
+@keyframes gate-blink{0%,100%{opacity:1}50%{opacity:0}}
+body.gate-locked{overflow:hidden;height:100vh;}
+body.gate-locked > *{visibility:hidden;}
+body.gate-locked > #pw-gate,
+body.gate-locked > #gate-flash{visibility:visible;}
+#pw-gate{position:fixed;inset:0;z-index:100000;background:var(--black);display:flex;justify-content:flex-start;align-items:center;padding-left:88px;}
+
+</style>
+<style>
+.cover h1 .t1,.cover h1 .t2{display:block;}
+</style>
+</head>
+<body>
+
+<!-- ══ PASSWORD GATE ══════════════════════════════════════════ -->
+
+
+<div id="progress"></div>
+<canvas id="ks-grain"></canvas>
+
+<div id="topbar">
+  <span class="lbl-left">External Validation · v1.0</span>
+  <span class="lbl-right"><svg width="14" height="14" viewBox="0 0 32 32" style="display:inline-block;vertical-align:-2px;margin-right:6px;" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="32" fill="#FF0000"/><rect x="13" y="6" width="6" height="20" fill="#fff"/><rect x="6" y="13" width="20" height="6" fill="#fff"/></svg>Kairos Systems™</span>
+</div>
+
+<div class="page">
+<div class="cover">
+  <div class="k-eyebrow">Kairos Systems™ — Validation and Evidence Dossier</div>
+  <h1><span class="t1">VALIDATION</span><span class="t2">Reference End-to-End Proof</span></h1>
+  <div class="about-top" id="sec-about-kairos-systems"><div class="sec-eyebrow"><span class="sec-num">—</span><span class="sec-title red">About Kairos Systems</span><a class="plink" href="#sec-about-kairos-systems" aria-label="Permalink">#</a></div><div class="sec-rule"></div><p class="body-text">Kairos is a deterministic decision infrastructure for critical, regulated environments. It produces decisions whose artifacts, history, and cryptographic evidence can be independently verified, without exposing proprietary code or data.</p><p class="body-text"><b>Kairos Systems moves the proof ahead of the act.</b></p></div>
+  <div class="objet"><b class="objet-t">Purpose of This Dossier</b></div>
+  <div class="pg intro-parts">
+    <p class="ip-t">Part A — External Replay</p>
+    <p>To enable a third party to reconstruct, on an environment under its exclusive control, the artifacts published by Kairos Systems, verify their cryptographic hashes, and independently attest to the results.</p>
+    <p class="ip-t">Part B — Chain of Evidence</p>
+    <p>To present the cryptographic framework underpinning this validation: replay of a public artifact, verification of its inclusion in a Merkle tree compliant with RFC 6962, followed by validation of the dual RFC 3161 timestamp establishing the priority date of the evidence.</p>
+  </div>
+  <div class="meta">
+    <div class="mk">Issuer</div><div class="mv">Aether Paris SAS — Kairos Systems</div>
+    <div class="mk">Version · Date</div><div class="mv">1.0 · 2026-07-25</div>
+    <div class="mk">Distribution</div><div class="mv">External<br>Defense, pharmaceutical industry, nuclear, aerospace<br>Part A — external validator; Part B — evaluating partner</div>
+    <div class="mk">Level</div><div class="mv">Digital substrate, replay of a recorded artifact<br>and sealed chain of evidence</div>
+    <div class="mk">Duration</div><div class="mv">1 to 15 minutes of execution depending on the machine<br>Allow 30 minutes including review and recordkeeping</div>
+  </div>
+</div>
+
+
+
+<div id="kmenu"><div class="mhead"><span class="mlab">Table of Contents</span><span class="mcount">39 entries</span><span class="mfilter"><input type="search" id="kq" placeholder="Filter" aria-label="Filter table of contents"></span></div><div class="mgrid" id="kgrid"><a href="#sec-about-kairos-systems"><span class="mn">—</span><span class="mt">About Kairos Systems</span></a><a href="#part-a"><span class="mn">A</span><span class="mt">External Replay</span></a><a href="#pa-01-objet-et-principe"><span class="mn">01</span><span class="mt">Purpose and Principle</span></a><a href="#pa-02-regles-applicables-a-kairos-systems"><span class="mn">02</span><span class="mt">Rules Applicable to Kairos Systems</span></a><a href="#pa-03-prerequis"><span class="mn">03</span><span class="mt">Prerequisites</span></a><a href="#pa-04-outil-de-verification-guidee"><span class="mn">04</span><span class="mt">Guided Verification Tool</span></a><a href="#pa-05-execution"><span class="mn">05</span><span class="mt">Execution</span></a><a href="#pa-06-empreintes-publiees"><span class="mn">06</span><span class="mt">Published Hashes</span></a><a href="#pa-07-resultats-de-reference"><span class="mn">07</span><span class="mt">Reference Results</span></a><a href="#pa-08-traitement-des-divergences"><span class="mn">08</span><span class="mt">Handling Discrepancies</span></a><a href="#pa-09-transmission-du-rapport"><span class="mn">09</span><span class="mt">Report Submission</span></a><a href="#pa-10-attestation-de-rejeu-externe"><span class="mn">10</span><span class="mt">External Replay Attestation</span></a><a href="#pa-11-usage-de-l-attestation"><span class="mn">11</span><span class="mt">Use of the Attestation</span></a><a href="#pa-12-perimetre-et-suite"><span class="mn">12</span><span class="mt">Scope and Next Steps</span></a><a href="#pa-13-references"><span class="mn">13</span><span class="mt">References</span></a><a href="#pa-14-pieces-transmises"><span class="mn">14</span><span class="mt">Submitted Materials</span></a><a href="#part-b"><span class="mn">B</span><span class="mt">Evidence Architecture</span></a><a href="#sec-chaine"><span class="mn">→</span><span class="mt">Chain of Evidence</span></a><a href="#sec-01-contexte"><span class="mn">01</span><span class="mt">Context</span></a><a href="#sec-02-principe-de-verification"><span class="mn">02</span><span class="mt">Verification Principle</span></a><a href="#sec-03-scenario-de-demonstration"><span class="mn">03</span><span class="mt">Demonstration Scenario</span></a><a href="#sec-03-acte-2"><span class="mn">03.2</span><span class="mt">Act 2</span></a><a href="#sec-03-acte-3"><span class="mn">03.3</span><span class="mt">Act 3</span></a><a href="#sec-04-modele-de-confiance"><span class="mn">04</span><span class="mt">Trust Model</span></a><a href="#sec-05-perimetre-de-validite-declare"><span class="mn">05</span><span class="mt">Declared Scope of Validity</span></a><a href="#sec-06-limites-declarees"><span class="mn">06</span><span class="mt">Declared Limitations</span></a><a href="#sec-07-tests-complementaires-possibles"><span class="mn">07</span><span class="mt">Additional Possible Tests</span></a><a href="#sec-08-proprietes-de-detection-du-dispositif"><span class="mn">08</span><span class="mt">Detection Properties of the System</span></a><a href="#sec-08bis-ce-que-demontre-cette-demonstration"><span class="mn">08bis</span><span class="mt">What This Demonstration Proves</span></a><a href="#sec-09-conclusion"><span class="mn">09</span><span class="mt">Conclusion</span></a><a href="#sec-e2-rejeu-d-un-artefact-sur-environnement-tiers"><span class="mn">10</span><span class="mt">Replay of an Artifact on a Third-Party Environment</span></a><a href="#sec-e3-arbre-de-merkle-rfc-6962"><span class="mn">11</span><span class="mt">Merkle Tree — RFC 6962</span></a><a href="#sec-06-durees-mesurees"><span class="mn">B.1</span><span class="mt">Measured Durations</span></a><a href="#sec-05-decompte-des-artefacts"><span class="mn">B.2</span><span class="mt">Artifact Count</span></a><a href="#sec-a-3-table-de-correspondance-affirmation-piece-empreinte"><span class="mn">A.3</span><span class="mt">Correspondence Table — Claim → Exhibit → Hash</span></a><a href="#sec-a-45-niveaux-de-confiance-enquetes-ouvertes"><span class="mn">A.4–5</span><span class="mt">Confidence Levels · Open Inquiries</span></a><a href="#sec-a-6-pieces-exclues-de-la-diffusion-externe"><span class="mn">A.6</span><span class="mt">Materials Excluded from External Distribution</span></a><a href="#sec-annexe-a-index-des-preuves-de-la-demonstration"><span class="mn">ANNEX A</span><span class="mt">Index of Demonstration Evidence</span></a><a href="#sec-artefacts"><span class="mn">↓</span><span class="mt">Artifacts, Hashes &amp; Download</span></a></div><div class="mnone" id="knone">No matching section</div></div>
+
+<section id="part-a" class="partsep">
+ <div class="part-eyebrow"><span class="part-l">Part A</span><span class="part-t">External Replay</span></div>
+ <div class="part-rule"></div>
+ <div class="pg"><p>Protocol executable by a third party on its own machine.</p>
+ <p>It assumes no confidentiality agreement and no access to a Kairos system.</p></div>
+</section>
+
+
+
+
+<section id="pa-01-objet-et-principe">
+<div class="sec-eyebrow"><div class="sec-num">01</div><div class="sec-title">Purpose and Principle</div><a class="plink" href="#pa-01-objet-et-principe" aria-label="Permalink">#</a></div>
+<div class="sec-rule"></div>
+<p class="body-text">Kairos Systems publishes a verifier, the hashes this verifier produces, and the declared scope of validity of that claim. This protocol allows a third party to recompute them on its own environment, without any intervention by Kairos Systems.</p>
+<p class="body-text">The objective is not to ask the validator to trust Kairos Systems. The objective is to enable the validator to reproduce the published results independently. <b>Any observed discrepancy takes precedence over Kairos Systems' claims.</b></p>
+<p class="body-text">This document is self-contained. It requires no assistance from Kairos Systems to be executed.</p>
+
+<div class="sub-title red">What Is Requested</div>
+<div class="pg"><p>Execute the protocol on an environment controlled by the validator.</p>
+<p>Record the hashes obtained.</p>
+<p>Produce a factual attestation of what was observed.</p></div>
+
+<div class="sub-title red">What Is Not Requested</div>
+<div class="pg"><p>No validation, no certification, no audit.</p>
+<p>No judgment on the Kairos product.</p>
+<p>No conclusion beyond what was personally executed.</p></div>
+
+<div class="sub-title red">Characterization of This Exercise</div>
+<div class="pg"><p>This exercise constitutes an <b>external replay</b>.</p>
+<p>It constitutes neither an independent validation, nor a certification, nor a regulatory audit.</p>
+<p>Kairos Systems commits to using none of these terms in reference to this exercise.</p></div>
+</section>
+
+<section id="pa-02-regles-applicables-a-kairos-systems">
+<div class="sec-eyebrow"><div class="sec-num">02</div><div class="sec-title">Rules Applicable to Kairos Systems</div><a class="plink" href="#pa-02-regles-applicables-a-kairos-systems" aria-label="Permalink">#</a></div>
+<div class="sec-rule"></div>
+<table class="kt">
+<thead><tr><th style="width:8%">Rule</th><th>Commitment</th></tr></thead>
+<tbody>
+<tr><td>R1</td><td>Kairos Systems does not access the validator's environment at any point.</td></tr>
+<tr><td>R2</td><td>Kairos Systems enters no commands, shares no screen, and takes no remote control.</td></tr>
+<tr><td>R3</td><td>The validator executes the verifier published in the public repository and the guided verification tool whose hash is declared in Section 04.<span class="l2">No verbally given instruction may substitute for this.</span></td></tr>
+<tr><td>R4</td><td>If a result diverges, it is recorded as observed. No adjustment is made during execution.</td></tr>
+</tbody></table>
+<p class="body-text">A deviation from these rules invalidates the scope of the attestation.</p>
+</section>
+
+<section id="pa-03-prerequis">
+<div class="sec-eyebrow"><div class="sec-num">03</div><div class="sec-title">Prerequisites</div><a class="plink" href="#pa-03-prerequis" aria-label="Permalink">#</a></div>
+<div class="sec-rule"></div>
+<table class="kt">
+<thead><tr><th style="width:26%">Item</th><th>Requirement</th></tr></thead>
+<tbody>
+<tr><td>Environment</td><td>Machine under the validator's exclusive control<span class="l2">Linux x86_64 · macOS x86_64 · macOS Apple Silicon<br>These three platforms have been measured by Kairos Systems<br>On Windows, use WSL2, which provides a Linux x86_64 environment</span></td></tr>
+<tr><td>Software</td><td class="m">git · curl · python3 · tar<span class="l2">If the system interpreter is not version 3.10 to 3.12,<br>the tool installs one in the working directory</span></td></tr>
+<tr><td>Network access</td><td class="m">github.com · pypi.org · conda-forge<span class="l2">deepchemdata.s3.us-west-1.amazonaws.com</span></td></tr>
+<tr><td>Disk space</td><td>Less than 2 GB, fully removable</td></tr>
+<tr><td>Privileges</td><td>No administrator rights required. No password requested.<span class="l2">Nothing is installed outside the working directory.</span></td></tr>
+<tr><td>Account</td><td>No account, no registration, no access to a Kairos system</td></tr>
+</tbody></table>
+<div class="pg"><p>A local machine is the recommended path: a successful execution on the validator's own machine carries more weight than an execution in an environment suggested by Kairos Systems.</p>
+<p>In the event of a discrepancy attributable to the local environment, Section 08 provides for a second attempt on a neutral platform in order to distinguish an environmental discrepancy from a verifier discrepancy.</p></div>
+</section>
+
+<section id="pa-04-outil-de-verification-guidee">
+<div class="sec-eyebrow"><div class="sec-num">04</div><div class="sec-title">Guided Verification Tool</div><a class="plink" href="#pa-04-outil-de-verification-guidee" aria-label="Permalink">#</a></div>
+<div class="sec-rule"></div>
+<div class="pg"><p>The tool executes both parts of the protocol, compares the hashes obtained against the published hashes, and records the whole in an attestation data file.</p>
+<p><b>This tool measures and records. It does not interpret.</b> A measurement discrepancy is recorded as observed and execution continues; the tool never characterizes a result as acceptable or unacceptable.</p>
+<p>Only a technical impossibility — an inaccessible repository, an environment that cannot be created — interrupts execution, and the document then explicitly flags this as not being a verification result.</p></div>
+
+<div class="dl">
+  <div class="fn">validation_externe.sh</div>
+  <div class="fr">Guided verification tool. Readable source code, Apache 2.0 license. Installs nothing outside the working directory, requires no administrator rights, and modifies no system file.</div>
+  <div class="fm"><span>SHA-256</span><span class="hash">34dbeb14…c0eb750a9</span><span>16,052 bytes</span></div>
+  <button class="kbtn p" data-dl="f-script" data-name="validation_externe.sh">Download the tool</button>
+</div>
+
+<div class="sub-title red">Integrity Check Before Execution</div>
+<p class="body-text">The validator verifies that the downloaded tool matches the hash declared below before executing it.</p>
+<div class="big">34dbeb1490c371f29aed1ddce3264096e47818d183f97be8333e95fc0eb750a9</div>
+<pre class="code">sha256sum validation_externe.sh      # Linux
+shasum -a 256 validation_externe.sh  # macOS</pre>
+<p class="body-text">If the hash differs, the file is not the one described by this document: do not execute it, and report it to the address given in Section 09.</p>
+</section>
+
+<section id="pa-05-execution">
+<div class="sec-eyebrow"><div class="sec-num">05</div><div class="sec-title">Execution</div><a class="plink" href="#pa-05-execution" aria-label="Permalink">#</a></div>
+<div class="sec-rule"></div>
+<p class="body-text">A single command, after the integrity check.</p>
+<pre class="code">bash validation_externe.sh</pre>
+<p class="body-text">The tool requests confirmation at startup, then runs unattended. At each step it displays the command executed, the published hash, and the hash obtained.</p>
+
+<div class="step"><header><span class="n">1</span><h4>Retrieval of the Verifier</h4></header>
+<p class="body-text">Clone of the public repository and hash check of <span class="hash">determinism_ladder.py</span>, which must equal <span class="hash">e2f6cd4b…</span>. The verifier is fully readable, uses only numpy, pandas, and xgboost, opens no network connection, and accesses no Kairos system.</p></div>
+
+<div class="step"><header><span class="n">2</span><h4>Preparation of the Compute Environment</h4></header>
+<p class="body-text">The declared libraries require Python 3.10 or higher. If the system interpreter is older, the tool installs a 3.12 interpreter in the working directory. The path taken is displayed on screen and recorded in the attestation file.</p></div>
+
+<div class="step"><header><span class="n">3</span><h4>Determinism Ladder</h4></header>
+<p class="body-text">Execution of the verifier within the declared envelope, followed by comparison of the twelve hashes.</p>
+<pre class="code">OPENBLAS_CORETYPE=Haswell \
+OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
+PYTHONHASHSEED=0 python3 determinism_ladder.py</pre></div>
+
+<div class="step"><header><span class="n">4</span><h4>Measurement Outside the Envelope</h4></header>
+<p class="body-text">The same computation is rerun without the <span class="hash">OPENBLAS_CORETYPE</span> variable. The result is recorded without interpretation. This measurement documents the sensitivity of level L3 to the compute kernel actually loaded.</p></div>
+
+<div class="step"><header><span class="n">5</span><h4>Public Dataset</h4></header>
+<div class="pg"><p>Download of <span class="hash">BBBP.csv</span> from its original hosting location and check of its hash.</p>
+<p>This file does not originate from Kairos Systems.</p></div></div>
+
+<div class="step"><header><span class="n">6</span><h4>Reconstruction Environment</h4></header>
+<p class="body-text">The hash of a Parquet file depends on the exact versions of the libraries that write it. The tool installs the required envelope in the working directory, with no system-wide installation.</p>
+<table class="kt"><thead><tr><th>Component</th><th>Version</th></tr></thead><tbody>
+<tr><td>Python</td><td class="m">3.10</td></tr>
+<tr><td>pandas</td><td class="m">1.5.3</td></tr>
+<tr><td>pyarrow</td><td class="m">23.0.0</td></tr>
+<tr><td>numpy</td><td class="m">&lt; 2</td></tr>
+</tbody></table></div>
+
+<div class="step"><header><span class="n">7</span><h4>Artifact Reconstruction</h4></header>
+<p class="body-text">Three instructions from public libraries, no Kairos Systems component.</p>
+<pre class="code">df = pd.read_csv("BBBP.csv", low_memory=False)
+pq.write_table(pa.Table.from_pandas(df), "bbbp.parquet", compression="snappy")</pre>
+<p class="body-text">The hash of the resulting file is compared against the one recorded on 2026-06-06.</p></div>
+</section>
+
+<section id="pa-06-empreintes-publiees">
+<div class="sec-eyebrow"><div class="sec-num">06</div><div class="sec-title">Published Hashes</div><a class="plink" href="#pa-06-empreintes-publiees" aria-label="Permalink">#</a></div>
+<div class="sec-rule"></div>
+
+<div class="sub-title red">Files</div>
+<table class="kt">
+<thead><tr><th style="width:32%">Item</th><th>SHA-256 Hash</th></tr></thead>
+<tbody>
+<tr><td>determinism_ladder.py<span class="l2">public verifier</span></td><td class="m"><span class="hash">e2f6cd4b4e67e98d19adbd76e9e8c12eae0276cca3755b324e55f3b966525be4</span></td></tr>
+<tr><td>BBBP.csv<span class="l2">public dataset</span></td><td class="m"><span class="hash">d07a38487aeac5cee5508413e468043ef3097451d2a112701c2d60be9ec6b662</span></td></tr>
+<tr><td>bbbp.parquet<span class="l2">artifact recorded on 2026-06-06</span></td><td class="m"><span class="hash">4621ac8d5d4a728a169fb4d5b8c35682b954928a019d575e3eca140cd563489f</span></td></tr>
+</tbody></table>
+
+<div class="sub-title red">Determinism Ladder</div>
+<p class="body-text">Twelve hashes, published and measured by Kairos Systems across five independent environments.</p>
+<table class="kt">
+<thead><tr><th style="width:15%">Level</th><th>Linux x86_64</th><th>macOS x86_64</th><th>macOS Apple Silicon (M1)</th><th>macOS Apple Silicon (M2)</th></tr></thead>
+<tbody><tr><td>L0</td><td class="m"><span class='hash'>1d9e01d16d638900</span></td><td class="m"><span class='hash'>1d9e01d16d638900</span></td><td class="m"><span class='hash'>1d9e01d16d638900</span></td><td class="m"><span class='hash'>1d9e01d16d638900</span></td></tr><tr><td>L1</td><td class="m"><span class='hash'>84af2aaa28305585</span></td><td class="m"><span class='hash'>84af2aaa28305585</span></td><td class="m"><span class='hash'>84af2aaa28305585</span></td><td class="m"><span class='hash'>84af2aaa28305585</span></td></tr><tr><td>L1b</td><td class="m"><span class='hash'>9984517da6ef41ff</span></td><td class="m"><span class='hash'>9984517da6ef41ff</span></td><td class="m"><span class='hash'>9984517da6ef41ff</span></td><td class="m"><span class='hash'>9984517da6ef41ff</span></td></tr><tr><td>L2</td><td class="m"><span class='hash'>86ca842440c89f74</span></td><td class="m"><span class='hash'>86ca842440c89f74</span></td><td class="m"><span class='hash'>86ca842440c89f74</span></td><td class="m"><span class='hash'>86ca842440c89f74</span></td></tr><tr><td>L3</td><td class="m"><span class='hash'>60da9d0bfeb7bb99</span></td><td class="m"><span class='hash'>a0dff7a2a4c25ac3</span></td><td class="m"><span class='hash'>19ea7a60195f404e</span></td><td class="m"><span class='hash'>1ab05d826be5327e</span></td></tr><tr><td>L3b</td><td class="m"><span class='hash'>db791086e49a76e2</span></td><td class="m"><span class='hash'>db791086e49a76e2</span></td><td class="m"><span class='hash'>db791086e49a76e2</span></td><td class="m"><span class='hash'>db791086e49a76e2</span></td></tr><tr><td>L4</td><td class="m"><span class='hash'>0bf4f040e2ee2721</span></td><td class="m"><span class='hash'>0bf4f040e2ee2721</span></td><td class="m"><span class='hash'>0bf4f040e2ee2721</span></td><td class="m"><span class='hash'>0bf4f040e2ee2721</span></td></tr><tr><td>L4b</td><td class="m"><span class='hash'>9d40cfbddb0c14ca</span></td><td class="m"><span class='hash'>9d40cfbddb0c14ca</span></td><td class="m"><span class='hash'>9d40cfbddb0c14ca</span></td><td class="m"><span class='hash'>9d40cfbddb0c14ca</span></td></tr><tr><td>L5</td><td class="m"><span class='hash'>687b5cae54c0f69f</span></td><td class="m"><span class='hash'>687b5cae54c0f69f</span></td><td class="m"><span class='hash'>16b00268e85dab2d</span></td><td class="m"><span class='hash'>16b00268e85dab2d</span></td></tr><tr><td>L5b</td><td class="m"><span class='hash'>d36851807abf6013</span></td><td class="m"><span class='hash'>d36851807abf6013</span></td><td class="m"><span class='hash'>d36851807abf6013</span></td><td class="m"><span class='hash'>d36851807abf6013</span></td></tr><tr><td>L6 · measurement 1</td><td class="m"><span class='hash'>e05c0b80de5ce5e4</span></td><td class="m"><span class='hash'>e113a7436dc21812</span></td><td class="m"><span class='hash'>5a74cec7f7796ad1</span></td><td class="m"><span class='hash'>5a74cec7f7796ad1</span></td></tr><tr><td>L6 · measurement 2</td><td class="m"><span class='hash'>e05c0b80de5ce5e4</span></td><td class="m"><span class='hash'>e113a7436dc21812</span></td><td class="m"><span class='hash'>5a74cec7f7796ad1</span></td><td class="m"><span class='hash'>5a74cec7f7796ad1</span></td></tr></tbody></table>
+<div class="pg"><p>The published hashes pertain to the declared envelope on the Linux x86_64 environment.</p>
+<p>On macOS, certain levels produce distinct values, specific to each platform and stable from one execution to another.</p></div>
+<p class="plabel">Reading the Discrepancies</p>
+<div class="pg"><p>The L3 matrix product takes four distinct values depending on the BLAS implementation actually loaded: OpenBLAS on Linux, Apple's Accelerate library on macOS, in three variants depending on architecture and chip generation (Intel x86_64, Apple M1, Apple M2). The two L6 measurements, delegated to the xgboost library, take a value specific to each platform, identical between single-thread and multi-thread mode. On macOS, outside the declared envelope, the L3 level (BLAS matmul) shows different values depending on the physical environment tested: Intel x86_64, Apple M1, and Apple M2. The virtualized M2 Pro runner reproduces the value obtained on M1. This observation shows a dependency of the L3 result on the execution environment; it does not, on its own, allow causal attribution of this variation to chip generation or virtualization. The L5 and L6 levels show, across the tested Apple Silicon environments, the same divergences from the canonical reference.</p>
+<p>On Apple Silicon architecture, the L5 aggregation also produces a distinct value.</p></div>
+<div class="pg"><p>These discrepancies characterize the compute substrate, not the measurement instrument:</p>
+<p>each platform produces a value that is stable and reproducible on itself.</p>
+<p>They do not affect the reconstruction of the artifact, which arrives at the published hash on all three platforms.</p></div>
+
+<div class="sub-title red">Measurement Environments</div>
+<table class="kt">
+<thead><tr><th style="width:8%">Ref.</th><th>Provider</th><th>Processor</th><th>Python</th></tr></thead>
+<tbody><tr><td>E1a</td><td>Kaggle</td><td>Intel Xeon @ 2.20 GHz</td><td class="m">3.12.13</td></tr><tr><td>E1b</td><td>Kaggle</td><td>AMD EPYC 7B12</td><td class="m">3.12.13</td></tr><tr><td>E2</td><td>Scaleway — France</td><td>AMD EPYC 9555P 64-Core</td><td class="m">3.10.12</td></tr><tr><td>E3</td><td>Infomaniak — Switzerland</td><td>AMD EPYC Genoa</td><td class="m">3.10.12</td></tr><tr><td>E4</td><td>Google Colab</td><td>Intel Xeon @ 2.20 GHz</td><td class="m">3.12.13</td></tr><tr><td>E5</td><td>GitHub Codespaces</td><td>AMD EPYC 9V74 80-Core</td><td class="m">3.12.1</td></tr></tbody></table>
+<p class="body-text">Five distinct providers (six executions, Kaggle having been allocated two distinct hardware instances, E1a and E1b), two hardware families — one Intel Xeon and four distinct AMD EPYC — and three Python versions. Across these six Linux executions, the twelve measurements are byte-identical.</p>
+</section>
+
+<section id="pa-07-resultats-de-reference">
+<div class="sec-eyebrow"><div class="sec-num">07</div><div class="sec-title">Reference Results</div><a class="plink" href="#pa-07-resultats-de-reference" aria-label="Permalink">#</a></div>
+<div class="sec-rule"></div>
+<p class="body-text">Kairos Systems executed this protocol in full prior to any transmission. The results below constitute the reference against which the validator can compare its own execution.</p>
+<blockquote><span class="qlabel">Current campaign</span>The Instance A and Instance B columns below are from the VALIDATION re-verification campaign of 2026-08-17, on Kairos infrastructure, with VERIFIER v1.0 (commit <span class="hash">528f8595…</span>, SHA-256 <span class="hash">e2f6cd4b…</span>) and the tool <span class="hash">validation_externe.sh</span> (SHA-256 <span class="hash">34dbeb1490c371f29aed1ddce3264096e47818d183f97be8333e95fc0eb750a9</span>). Three independent executions per instance, identical script on both. The macOS columns are from an earlier campaign (2026-07-24, previous VERIFIER) and are retained as an out-of-envelope reference — not re-measured in the current campaign.</blockquote>
+<table class="kt">
+<thead><tr><th style="width:20%">Measurement</th><th>Instance A — RUN 1</th><th>Instance A — RUN 2</th><th>Instance A — RUN 3</th><th>Instance B — RUN 1</th><th>Instance B — RUN 2</th><th>Instance B — RUN 3</th></tr></thead>
+<tbody>
+<tr><td>Provider</td><td colspan="3">Infomaniak — Switzerland</td><td colspan="3">Scaleway — France</td></tr>
+<tr><td>Processor</td><td colspan="3">AMD EPYC-Genoa Processor</td><td colspan="3">AMD EPYC 9555P 64-Core Processor</td></tr>
+<tr><td>System Python</td><td colspan="3" class="m">3.10.12</td><td colspan="3" class="m">3.10.12</td></tr>
+<tr><td>Verifier hash</td><td>identical</td><td>identical</td><td>identical</td><td>identical</td><td>identical</td><td>identical</td></tr>
+<tr><td>Determinism ladder</td><td><b>12/12</b></td><td><b>12/12</b></td><td><b>12/12</b></td><td><b>12/12</b></td><td><b>12/12</b></td><td><b>12/12</b></td></tr>
+<tr><td>L3 without OPENBLAS_CORETYPE</td><td colspan="3"><span class="hash">c210e706…</span></td><td colspan="3"><span class="hash">c210e706…</span></td></tr>
+<tr><td>Dataset hash</td><td>identical</td><td>identical</td><td>identical</td><td>identical</td><td>identical</td><td>identical</td></tr>
+<tr><td>Reconstructed artifact hash</td><td><b>identical</b></td><td><b>identical</b></td><td><b>identical</b></td><td><b>identical</b></td><td><b>identical</b></td><td><b>identical</b></td></tr>
+<tr><td>Execution date</td><td colspan="3" class="m">2026-08-17</td><td colspan="3" class="m">2026-08-17</td></tr>
+</tbody></table>
+<p class="body-text">Tool <span class="hash">validation_externe.sh</span> identical across all six executions (SHA-256 <span class="hash">34dbeb1490c371f29aed1ddce3264096e47818d183f97be8333e95fc0eb750a9</span>), confirmed by integrity check before each run. Evidence recorded and hashed: <span class="hash">EVIDENCE/RUN-A{1,2,3}_2026-08-17_v2</span> and <span class="hash">EVIDENCE/RUN-B{1,2,3}_2026-08-17_v2</span>, each with <span class="hash">ATTESTATION_DATA.txt</span> and <span class="hash">SHA256SUMS.txt</span> verified intact.</p>
+
+<div class="sub-title">Historical reference — outside envelope (2026-07-24 campaign, previous VERIFIER)</div>
+<table class="kt">
+<thead><tr><th style="width:26%">Measurement</th><th>macOS x86_64</th><th>macOS Apple Silicon</th></tr></thead>
+<tbody>
+<tr><td>Processor</td><td>Intel Core i5-7360U</td><td>Apple M1<span class="l2">GitHub Actions macos-14 runner</span></td></tr>
+<tr><td>System Python</td><td class="m">3.9.6</td><td class="m">3.14.6</td></tr>
+<tr><td>Determinism ladder</td><td><b>9 of 12 identical</b><span class="l2">L3, L6 measurements 1 and 2</span></td><td><b>8 of 12 identical</b><span class="l2">L3, L5, L6 measurements 1 and 2</span></td></tr>
+<tr><td>Reconstructed artifact hash</td><td><b>identical</b></td><td><b>identical</b></td></tr>
+<tr><td>Execution date</td><td class="m">2026-07-24</td><td class="m">2026-07-24</td></tr>
+</tbody></table>
+<p class="plabel">Reading the Reference Results</p>
+<p class="body-text">The published hashes concern the declared envelope on the Linux x86_64 environment.</p>
+<p class="body-text">On macOS, certain levels produce distinct values, specific to each platform and stable from one execution to the next.</p>
+<p class="body-text">The matrix product L3 takes on three distinct values depending on the BLAS implementation actually loaded: OpenBLAS on Linux, Apple's Accelerate library on macOS, in two variants depending on architecture. The two L6 measurements, delegated to the xgboost library, take on a value specific to each platform, identical between single-thread and multi-thread mode.</p>
+<p class="body-text">On Apple Silicon architecture, the L5 aggregation also produces a distinct value.</p>
+<p class="body-text">These discrepancies characterize the computation substrate, not the measurement instrument: each platform produces a stable, reproducible value on itself. They do not affect artifact reconstruction, which arrives at the published hash on all three platforms.</p>
+</section>
+
+<section id="pa-08-traitement-des-divergences">
+<div class="sec-eyebrow"><div class="sec-num">08</div><div class="sec-title">Handling Discrepancies</div><a class="plink" href="#pa-08-traitement-des-divergences" aria-label="Permalink">#</a></div>
+<div class="sec-rule"></div>
+<div class="pg"><p>A divergent result is a result.</p>
+<p>It is recorded as observed in the attestation, with no adjustment or re-run.</p></div>
+<table class="kt">
+<thead><tr><th style="width:34%">Observation</th><th>Action</th></tr></thead>
+<tbody>
+<tr><td>Tool hash does not match</td><td>Do not execute. Report it.</td></tr>
+<tr><td>Verifier hash does not match</td><td>Record and report.<span class="l2">The verifier executed is not the one that produced the published measurements.</span></td></tr>
+<tr><td>Discrepancy on the determinism ladder</td><td>Record the values obtained.<span class="l2">Report the full environment in the attestation.</span></td></tr>
+<tr><td>Discrepancy on the reconstructed artifact</td><td>Record it. Verify that the declared envelope was actually obtained.<span class="l2">The tool displays the versions actually installed.</span></td></tr>
+<tr><td>Discrepancy attributable to the local environment</td><td>A second attempt on a neutral platform distinguishes an environmental discrepancy from a verifier discrepancy.<span class="l2">Both executions are then recorded.</span></td></tr>
+<tr><td>Technical interruption</td><td>This does not constitute a verification result. The tool flags this explicitly. Submit the partial log.</td></tr>
+</tbody></table>
+<div class="pg"><p>Kairos Systems commits to publishing any discrepancy finding concerning the published hashes, regardless of consequence, and to documenting its cause in the public repository.</p>
+<p>A verifier that cannot contradict its own publisher verifies nothing.</p></div>
+</section>
+
+<section id="pa-09-transmission-du-rapport">
+<div class="sec-eyebrow"><div class="sec-num">09</div><div class="sec-title">Report Submission</div><a class="plink" href="#pa-09-transmission-du-rapport" aria-label="Permalink">#</a></div>
+<div class="sec-rule"></div>
+<p class="body-text">Upon completion of execution, the tool produces an attestation data file containing the environment, the execution path, the library versions obtained, and each published hash alongside the hash obtained.</p>
+<div class="big">~/kairos_verification/ATTESTATION_DATA.txt</div>
+<table class="kt">
+<thead><tr><th style="width:26%">Item</th><th>Destination</th></tr></thead>
+<tbody>
+<tr><td>Execution report<span class="l2">ATTESTATION_DATA.txt</span></td><td class="m">security@kairossystems.ch</td></tr>
+<tr><td>Signed attestation<span class="l2">Section 10</span></td><td class="m">security@kairossystems.ch</td></tr>
+<tr><td>Discrepancy finding</td><td class="m">security@kairossystems.ch</td></tr>
+</tbody></table>
+<p class="body-text">The contents of the file are fully readable prior to transmission. It contains no information about the validator other than a technical description of the machine that executed the protocol.</p>
+<p class="body-text">The working directory can be removed entirely with <span class="hash">rm -rf ~/kairos_verification</span>.</p>
+</section>
+
+<section id="pa-10-attestation-de-rejeu-externe">
+<div class="sec-eyebrow"><div class="sec-num">10</div><div class="sec-title">External Replay Attestation</div><a class="plink" href="#pa-10-attestation-de-rejeu-externe" aria-label="Permalink">#</a></div>
+<div class="sec-rule"></div>
+<p class="body-text">To be reproduced on the validator's letterhead, completed from the attestation data file, then dated and signed.</p>
+
+<div class="dl-wide"><button class="kbtn-wide" data-dl="f-attestation" data-name="ATTESTATION_REJEU_EXTERNE.txt" type="button">Download the attestation template</button></div>
+</section>
+
+<section id="pa-11-usage-de-l-attestation">
+<div class="sec-eyebrow"><div class="sec-num">11</div><div class="sec-title">Use of the Attestation</div><a class="plink" href="#pa-11-usage-de-l-attestation" aria-label="Permalink">#</a></div>
+<div class="sec-rule"></div>
+<table class="kt">
+<thead><tr><th style="width:34%">Status</th><th>Wording</th></tr></thead>
+<tbody>
+<tr><td>Authorized</td><td>"External replay — [validator], [date]."<span class="l2">"The published protocol was executed by a third party on its own environment. Attestation available."</span></td></tr>
+<tr><td>Prohibited</td><td>"Independent validation" · "Certification" · "Third-party audit" · "Validated by [validator]"</td></tr>
+</tbody></table>
+<p class="body-text">Kairos Systems commits not to use the prohibited wording in reference to this exercise, and to cite the attestation only together with its declared scope. The attestation will be disclosed only with the written consent of its author, and in full — never as an excerpt.</p>
+</section>
+
+<section id="pa-12-perimetre-et-suite">
+<div class="sec-eyebrow"><div class="sec-num">12</div><div class="sec-title">Scope and Next Steps</div><a class="plink" href="#pa-12-perimetre-et-suite" aria-label="Permalink">#</a></div>
+<div class="sec-rule"></div>
+<p class="plabel">What This Protocol Establishes</p>
+<p class="body-text">That the hashes published by Kairos Systems can be recomputed by a third party, on its own machine, from public resources, and that an artifact recorded on 2026-06-06 is byte-for-byte reconstructible.</p>
+<p class="plabel">What It Does Not Establish</p>
+<p class="body-text">This artifact's membership in a sealed set, verification of its inclusion proof in the Merkle tree, and validation of the timestamp tokens are not part of this protocol.</p>
+<p class="plabel">Next Level</p>
+<p class="body-text">Continuity between the reconstructed artifact and the sealed historical proof — an inclusion proof compliant with RFC 6962 and verification of the two 2026-06-06 timestamp tokens — is the subject of a separate protocol and a dedicated kit, subject to a prior confidentiality agreement.</p>
+<table class="kt">
+<thead><tr><th style="width:34%">2026-06-06 Timestamp</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td>SwissSign ZertES<span class="l2">2.16.756.1.89.1.1.3.5</span></td><td>Qualified timestamping authority under Swiss law</td></tr>
+<tr><td>Sectigo — United Kingdom<span class="l2">1.3.6.1.4.1.6449.2.1.1</span></td><td>Publicly trusted timestamping authority, not qualified under the European Union's eIDAS regulation</td></tr>
+</tbody></table>
+<div class="pg"><p>Both tokens bear the same hash and the same second.</p>
+<p>Their verification falls under the next level.</p></div>
+</section>
+
+<section id="pa-13-references">
+<div class="sec-eyebrow"><div class="sec-num">13</div><div class="sec-title">References</div><a class="plink" href="#pa-13-references" aria-label="Permalink">#</a></div>
+<div class="sec-rule"></div>
+<div class="kv">
+<div class="k">Public repository</div><div class="v"><a class="klink" href="https://github.com/KAIROSSYSTEMSCH/KAIROS-VERIFIER" target="_blank" rel="noopener noreferrer">https://github.com/KAIROSSYSTEMSCH/KAIROS-VERIFIER</a></div>
+<div class="k">Dataset</div><div class="v"><a class="klink" href="https://deepchemdata.s3.us-west-1.amazonaws.com/datasets/BBBP.csv" rel="noopener">deepchemdata.s3.us-west-1.amazonaws.com/datasets/BBBP.csv</a></div>
+<div class="k">Provenance</div><div class="v">Martins et al. (2012), <i>A Bayesian approach to in silico blood-brain barrier penetration modeling</i>, J. Chem. Inf. Model. 52(6):1686-1697. Distributed in the MoleculeNet collection, served by the public DeepChem infrastructure.</div>
+<div class="k">Tool license</div><div class="v">Apache 2.0</div>
+<div class="k">Reporting</div><div class="v"><a class="klink" href="https://kairossystems.ch/.well-known/security.txt" rel="noopener">https://kairossystems.ch/.well-known/security.txt</a></div>
+<div class="k">Contact</div><div class="v">security@kairossystems.ch</div>
+</div>
+<p class="body-text">The verifier is published under the Apache 2.0 license. The BBBP dataset is distributed by DeepChem, whose library is published under the MIT license; most datasets in the MoleculeNet collection carry no license declaration of their own. This protocol does not redistribute the dataset: it points to its original source and publishes the expected hash.</p>
+</section>
+
+<section id="pa-14-pieces-transmises">
+<div class="sec-eyebrow"><div class="sec-num">14</div><div class="sec-title">Submitted Materials</div><a class="plink" href="#pa-14-pieces-transmises" aria-label="Permalink">#</a></div>
+<div class="sec-rule"></div>
+<table class="kt">
+<thead><tr><th style="width:44%">Item</th><th>Required</th></tr></thead>
+<tbody>
+<tr><td>This document</td><td>Required</td></tr>
+<tr><td>validation_externe.sh<span class="l2">downloadable from this document</span></td><td>Required</td></tr>
+</tbody></table>
+<div class="pg"><p>No other item is required.</p>
+<p>The public repository and the dataset source are accessible without authentication.</p>
+<p>No confidentiality agreement is required at this level.</p></div>
+</section>
+
+
+
+<section id="part-b" class="partsep">
+ <div class="part-eyebrow"><span class="part-l">Part B</span><span class="part-t">Evidence Architecture</span></div>
+ <div class="part-rule"></div>
+ <div class="pg"><p>Presentation of the cryptographic chain linking the public dataset to the sealed artifact:</p>
+ <p>reconstruction of the artifact, verification of its inclusion in a Merkle tree compliant with RFC 6962, followed by validation of the dual RFC 3161 timestamp.</p></div>
+</section>
+
+
+
+
+
+<section id="sec-chaine">
+<div class="sec-eyebrow"><div class="sec-num">→</div><div class="sec-title">Chain of Evidence</div><a class="plink" href="#sec-chaine" aria-label="Permalink">#</a></div>
+<div class="sec-rule"></div>
+<div class="pg"><p>From the public dataset to the dual timestamp.</p>
+<p>Each link is executable by the evaluator.</p>
+<p>Clicking a step opens the corresponding section.</p></div>
+<div class="kchain">
+<svg viewBox="0 0 440 400" role="img" aria-label="Chain of evidence from the public CSV to the dual timestamp"><a class="cn" href="#sec-03-acte-2"><rect x="90" y="2" width="260" height="40"/><text class="st" x="220" y="15" text-anchor="middle">Public source</text><text class="lb" x="220" y="26" text-anchor="middle">BBBP.csv</text><text class="hs" x="220" y="36" text-anchor="middle">d07a3848…</text></a><text class="arw" x="220" y="54" text-anchor="middle">▼</text><a class="cn" href="#sec-03-acte-2"><rect x="90" y="60" width="260" height="40"/><text class="st" x="220" y="73" text-anchor="middle">Reconstructed artifact</text><text class="lb" x="220" y="84" text-anchor="middle">bbbp.parquet</text><text class="hs" x="220" y="94" text-anchor="middle">4621ac8d…</text></a><text class="arw" x="220" y="112" text-anchor="middle">▼</text><a class="cn" href="#sec-03-acte-2"><rect x="90" y="118" width="260" height="30"/><text class="st" x="220" y="130" text-anchor="middle">Hash</text><text class="lb" x="220" y="141" text-anchor="middle">SHA-256 · comparison to the seal</text></a><text class="arw" x="220" y="160" text-anchor="middle">▼</text><a class="cn" href="#sec-e3-arbre-de-merkle-rfc-6962"><rect x="90" y="166" width="260" height="40"/><text class="st" x="220" y="179" text-anchor="middle">Leaf</text><text class="lb" x="220" y="190" text-anchor="middle">RFC 6962</text><text class="hs" x="220" y="200" text-anchor="middle">0x00 ‖ sha256_parquet</text></a><text class="arw" x="220" y="218" text-anchor="middle">▼</text><a class="cn" href="#sec-e3-arbre-de-merkle-rfc-6962"><rect x="90" y="224" width="260" height="40"/><text class="st" x="220" y="237" text-anchor="middle">Root · 46 leaves</text><text class="lb" x="220" y="248" text-anchor="middle">Merkle root</text><text class="hs" x="220" y="258" text-anchor="middle">5200d0cd…</text></a><text class="arw" x="220" y="276" text-anchor="middle">▼</text><a class="cn" href="#sec-03-acte-3"><rect x="20" y="282" width="180" height="30"/><text class="st" x="110" y="294" text-anchor="middle">Qualified ZertES CH</text><text class="lb" x="110" y="305" text-anchor="middle">SwissSign TSA</text></a><text class="pl" x="220" y="302" text-anchor="middle">+</text><a class="cn" href="#sec-03-acte-3"><rect x="240" y="282" width="180" height="30"/><text class="st" x="330" y="294" text-anchor="middle">Public trust UK</text><text class="lb" x="330" y="305" text-anchor="middle">Sectigo TSA</text></a><text class="arw" x="220" y="324" text-anchor="middle">▼</text><a class="cn" href="#sec-03-acte-3"><rect x="90" y="330" width="260" height="30"/><text class="st" x="220" y="342" text-anchor="middle">2026-06-06 · 17:59:04 UTC</text><text class="lb" x="220" y="353" text-anchor="middle">Priority date established</text></a><text class="arw" x="220" y="374" text-anchor="middle">▼</text><text x="220" y="390" text-anchor="middle"><tspan class="sealr">Sealed kit 2026-07-22</tspan><tspan class="hs"> · d68caaab…</tspan></text></svg>
+</div>
+</section>
+
+
+<section id="sec-01-contexte">
+ <div class="sec-eyebrow"><span class="sec-num">01</span><span class="sec-title">Context</span><a class="plink" href="#sec-01-contexte" aria-label="Permalink">#</a></div>
+ <div class="sec-rule"></div>
+<div class="pg">
+<p>A data-processing pipeline that does not replay identically cannot be audited.</p>
+<p>In a regulated environment, the requirement is not that the system works — it is that one can demonstrate, months later, that what was executed is exactly what is declared.</p>
+</div><p class="body-text">Most systems claim this property. Few make it verifiable by a third party.</p><div class="pg">
+<p>Kairos Systems publishes its verifier, its expected hashes, and its declared scope of validity.</p>
+<p>This demonstration does not ask for trust in Kairos — it asks for verification.</p>
+</div>
+</section>
+
+<section id="sec-02-principe-de-verification">
+ <div class="sec-eyebrow"><span class="sec-num">02</span><span class="sec-title">Verification Principle</span><a class="plink" href="#sec-02-principe-de-verification" aria-label="Permalink">#</a></div>
+ <div class="sec-rule"></div>
+<pre class="code diag">Public source
+reference scientific dataset, outside Kairos
+  ▼
+Third-party environment
+evaluator's machine, fresh environment
+  ▼
+Artifact reconstruction
+three calls to open-source libraries
+  ▼
+Cryptographic hash
+SHA-256 of the resulting file
+  ▼
+Comparison with the historical proof
+hash recorded and timestamped on 2026-06-06</pre><div class="pg">
+<p>No step requires access to Kairos systems.</p>
+<p>No proprietary Kairos component is executed.</p>
+<p>The only Kairos component used is the public verifier — published under the Apache 2.0 license.</p>
+</div>
+</section>
+
+<section id="sec-03-scenario-de-demonstration">
+ <div class="sec-eyebrow"><span class="sec-num">03</span><span class="sec-title">Demonstration Scenario</span><a class="plink" href="#sec-03-scenario-de-demonstration" aria-label="Permalink">#</a></div>
+ <div class="sec-rule"></div>
+<div class="sub-title">Act 1 — Verification of the Execution Environment</div>
+<div class="sub-title red">What the Evaluator Does</div>
+<div class="pg">
+<p>The evaluator opens a fresh compute environment under its control.</p>
+<p>The evaluator clones the verifier's public repository and authenticates the script by its hash.</p>
+</div><pre class="code">git clone https://github.com/KAIROSSYSTEMSCH/KAIROS-VERIFIER.git
+cd KAIROS-VERIFIER
+sha256sum determinism_ladder.py</pre><div class="sub-title red">What Is Checked</div>
+<p class="body-text">The displayed hash must match the published one</p><pre class="code">e2f6cd4b4e67e98d19adbd76e9e8c12eae0276cca3755b324e55f3b966525be4</pre><div class="pg">
+<p>The script executed is the one that produced the published measurements.</p>
+<p>It is licensed under Apache 2.0 and fully readable.</p>
+</div><div class="sub-title red">What Is Visible</div>
+<div class="pg">
+<p>The script uses exclusively numpy, pandas, and xgboost.</p>
+<p>It opens no network connection, writes no file, and accesses no Kairos system.</p>
+</div><pre class="code">python3 -m venv env
+./env/bin/pip install -r requirements.txt
+
+OPENBLAS_CORETYPE=Haswell \
+OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
+PYTHONHASHSEED=0 ./env/bin/python3 determinism_ladder.py</pre><div class="sub-title red">Expected Result</div>
+<div class="pg">
+<p>Twelve measurements across the L0–L6 ladder, including the L1b/L3b/L4b/L5b variants and L6 single-/multi-thread,</p>
+<p>from the SHA-256 check through the predictions of an XGBoost model, producing the hashes published in EXPECTED_HASHES.md.</p>
+</div><pre class="code">L0  1d9e01d16d638900   L4  0bf4f040e2ee2721
+L1  84af2aaa28305585   L4b 9d40cfbddb0c14ca
+L1b 9984517da6ef41ff   L5  687b5cae54c0f69f
+L2  86ca842440c89f74   L5b d36851807abf6013
+L3  60da9d0bfeb7bb99   L6  e05c0b80de5ce5e4  single-thread
+L3b db791086e49a76e2   L6  e05c0b80de5ce5e4  multi-thread</pre><div class="sub-title red">Significance</div>
+<div class="pg">
+<p>These hashes were obtained across three independent environments,</p>
+<p>two cloud providers, two CPU hardware families — AMD EPYC and Intel Xeon — three Python versions.</p>
+<p>The ephemeral environments are not retained.</p>
+<p>Their outputs and hashes were recorded to the evidence ledger at the time of execution.</p>
+<p>The evaluator produces a fourth one.</p>
+</div>
+</section>
+
+<section id="sec-03-acte-2">
+ <div class="sec-eyebrow"><span class="sec-num">03.2</span><span class="sec-title">Act 2</span><a class="plink" href="#sec-03-acte-2" aria-label="Permalink">#</a></div>
+ <div class="sec-rule"></div>
+<div class="sub-title">Act 2 — Reconstruction of a Recorded Artifact</div>
+<div class="sub-title">Source Used</div>
+<pre class="code">curl -sL -o BBBP.csv https://deepchemdata.s3.us-west-1.amazonaws.com/datasets/BBBP.csv
+sha256sum BBBP.csv
+d07a38487aeac5cee5508413e468043ef3097451d2a112701c2d60be9ec6b662</pre><div class="pg">
+<p>The file is not provided by Kairos.</p>
+<p>It is downloaded by the evaluator from its original public source.</p>
+</div><div class="sub-title red">Transformation</div>
+<p class="body-text">The code used is deliberately minimal and entirely public.</p><pre class="code">uv venv --python 3.10 env310
+uv pip install --python env310/bin/python "pyarrow==23.0.0" "pandas==1.5.3" "numpy&lt;2"
+
+import pandas as pd, pyarrow as pa, pyarrow.parquet as pq, hashlib
+df = pd.read_csv('BBBP.csv', low_memory=False)
+t = pa.Table.from_pandas(df)
+pq.write_table(t, 'bbbp.parquet', compression='snappy')
+print(hashlib.sha256(open('bbbp.parquet','rb').read()).hexdigest())</pre><p class="body-text">Three calls to widely used, entirely public open-source libraries.</p><div class="sub-title">Result Obtained</div>
+<pre class="code">4621ac8d5d4a728a169fb4d5b8c35682b954928a019d575e3eca140cd563489f</pre><a href="data:text/x-python;base64,IyEvdXNyL2Jpbi9lbnYgcHl0aG9uMwoiIiIKS0FJUk9TIOKAlCBSZXByb2R1Y2liaWxpdHkgRGVtb25zdHJhdGlvbiAoQWN0IDIpClJlcGxheSBvZiBhIHJlY29yZGVkIGFydGlmYWN0LCBmcm9tIGEgcHVibGljIHNvdXJjZS4KCk5vIHByb3ByaWV0YXJ5IEthaXJvcyBjb21wb25lbnQuIFRocmVlIGNhbGxzIHRvIG9wZW4tc291cmNlIGxpYnJhcmllcy4KVGhlIHJlc3VsdGluZyBoYXNoIG11c3QgbWF0Y2ggdGhlIG9uZSBzZWFsZWQgb24gMjAyNi0wNi0wNi4KClJlcXVpcmVtZW50czoKICAgIHBpcCBpbnN0YWxsICJwYW5kYXM9PTEuNS4zIiAicHlhcnJvdz09MjMuMC4wIiAibnVtcHk8MiIKVXNhZ2U6CiAgICBweXRob24zIGthaXJvc19yZXBsYXlfYmJicC5weQoiIiIKaW1wb3J0IGhhc2hsaWIKaW1wb3J0IHVybGxpYi5yZXF1ZXN0CmltcG9ydCBwYW5kYXMgYXMgcGQKaW1wb3J0IHB5YXJyb3cgYXMgcGEKaW1wb3J0IHB5YXJyb3cucGFycXVldCBhcyBwcQoKU09VUkNFID0gImh0dHBzOi8vZGVlcGNoZW1kYXRhLnMzLnVzLXdlc3QtMS5hbWF6b25hd3MuY29tL2RhdGFzZXRzL0JCQlAuY3N2IgpDU1ZfU0hBMjU2X0VYUEVDVEVEID0gImQwN2EzODQ4N2FlYWM1Y2VlNTUwODQxM2U0NjgwNDNlZjMwOTc0NTFkMmExMTI3MDFjMmQ2MGJlOWVjNmI2NjIiClBBUlFVRVRfU0hBMjU2X1NFQUxFRCA9ICI0NjIxYWM4ZDVkNGE3MjhhMTY5ZmI0ZDViOGMzNTY4MmI5NTQ5MjhhMDE5ZDU3NWUzZWNhMTQwY2Q1NjM0ODlmIgoKCmRlZiBzaGEyNTYocGF0aCk6CiAgICByZXR1cm4gaGFzaGxpYi5zaGEyNTYob3BlbihwYXRoLCAicmIiKS5yZWFkKCkpLmhleGRpZ2VzdCgpCgoKZGVmIG1haW4oKToKICAgIHByaW50KCJwYW5kYXMiLCBwZC5fX3ZlcnNpb25fXywgInwgcHlhcnJvdyIsIHBhLl9fdmVyc2lvbl9fKQoKICAgICMgMS4gRG93bmxvYWQgdGhlIGRhdGFzZXQgZnJvbSBpdHMgcHVibGljIHNvdXJjZQogICAgdXJsbGliLnJlcXVlc3QudXJscmV0cmlldmUoU09VUkNFLCAiQkJCUC5jc3YiKQogICAgY3N2X2ggPSBzaGEyNTYoIkJCQlAuY3N2IikKICAgIHByaW50KCJDU1YgZG93bmxvYWRlZCA6IiwgY3N2X2gpCiAgICBwcmludCgiQ1NWIGV4cGVjdGVkICAgOiIsIENTVl9TSEEyNTZfRVhQRUNURUQpCiAgICBhc3NlcnQgY3N2X2ggPT0gQ1NWX1NIQTI1Nl9FWFBFQ1RFRCwgIlRoZSBzb3VyY2UgQ1NWIGRvZXMgbm90IG1hdGNoLiIKCiAgICAjIDIuIFRyYW5zZm9ybWF0aW9uOiB0aHJlZSBjYWxscyB0byBvcGVuLXNvdXJjZSBsaWJyYXJpZXMKICAgIGRmID0gcGQucmVhZF9jc3YoIkJCQlAuY3N2IiwgbG93X21lbW9yeT1GYWxzZSkKICAgIHByaW50KCJyb3dzIDoiLCBsZW4oZGYpKQogICAgdCA9IHBhLlRhYmxlLmZyb21fcGFuZGFzKGRmKQogICAgcHEud3JpdGVfdGFibGUodCwgImJiYnAucGFycXVldCIsIGNvbXByZXNzaW9uPSJzbmFwcHkiKQoKICAgICMgMy4gSGFzaCBhbmQgY29tcGFyaXNvbiB3aXRoIHRoZSBzZWFsZWQgYXJ0aWZhY3QKICAgIG9idGFpbmVkID0gc2hhMjU2KCJiYmJwLnBhcnF1ZXQiKQogICAgcHJpbnQoInBhcnF1ZXQgb2J0YWluZWQgOiIsIG9idGFpbmVkKQogICAgcHJpbnQoInBhcnF1ZXQgc2VhbGVkICAgOiIsIFBBUlFVRVRfU0hBMjU2X1NFQUxFRCkKICAgIHByaW50KCI+Pj4gTUFUQ0giIGlmIG9idGFpbmVkID09IFBBUlFVRVRfU0hBMjU2X1NFQUxFRCBlbHNlICI+Pj4gRElWRVJHRVMiKQoKCmlmIF9fbmFtZV9fID09ICJfX21haW5fXyI6CiAgICBtYWluKCkK" download="kairos_replay_bbbp.py" style="display:inline-block;margin:10px 0 4px;padding:8px 16px;background:var(--red);color:var(--white);font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;">Download the replay script — kairos_replay_bbbp.py</a>
+<div class="sub-title red">Frozen Envelope — Two Reproduction Vehicles</div>
+<p class="body-text">Byte-identical reproduction assumes the declared envelope — Python 3.10, pandas 1.5.3, pyarrow 23.0.0, numpy&lt;2. Two equivalent vehicles recreate it identically on any machine, including where the default Python is not 3.10:</p>
+<pre class="code"># Vehicle 1 — Docker (Dockerfile: FROM python:3.10.12-slim)
+docker build -t kairos-repro:1.0 .
+docker run --rm kairos-repro:1.0
+
+# Vehicle 2 — micromamba (notebooks: Colab, Kaggle…)
+micromamba create -y -p ./env python=3.10.12 pip -c conda-forge
+./env/bin/pip install pandas==1.5.3 pyarrow==23.0.0 "numpy&lt;2"
+./env/bin/python replay.py</pre>
+<p class="body-text">Reproduction verified on 2026-07-22 across three independent third-party environments — Codespaces under Docker, Colab, and Kaggle under micromamba — plus an offline check. A second campaign, on 2026-07-24, extends the verification to two operating systems and two processor architectures: Linux x86_64, macOS x86_64 Intel, and macOS arm64 Apple Silicon. All executions produce the expected hash <span class="hash">4621ac8d…</span>. Reconstruction therefore depends neither on the operating system nor on the processor architecture, but on the declared envelope. The Docker image hash produced by docker save is not claimed as a reproducibility property: the proof is the reproduction of the sealed artifact; the image and the micromamba environment are only means of reconstructing the envelope.</p>
+</section>
+
+<section id="sec-03-acte-3">
+ <div class="sec-eyebrow"><span class="sec-num">03.3</span><span class="sec-title">Act 3</span><a class="plink" href="#sec-03-acte-3" aria-label="Permalink">#</a></div>
+ <div class="sec-rule"></div>
+<div class="sub-title">Act 3 — Historical Verification</div>
+<div class="sub-title red">Comparison with the Recorded Hash</div>
+<p class="body-text">The Shadow Run ledger of 2026-06-06 contains, among its 46 artifact hashes</p><pre class="code">"bbbp/bbbp.parquet": "4621ac8d5d4a728a169fb4d5b8c35682b954928a019d575e3eca140cd563489f"</pre><div class="sub-title red">Result</div>
+<p class="body-text">The reconstructed hash is strictly identical to the one recorded on 2026-06-06.</p><div class="sub-title red">Significance</div>
+<div class="pg">
+<p>A machine Kairos does not control, a file Kairos does not provide.</p>
+<p>The evaluator reconstructed, byte for byte, an artifact whose hash was recorded six weeks earlier.</p>
+</div><div class="sub-title red">Position in the Evidence Structure</div>
+<p class="body-text">This artifact is leaf index 19 of a Merkle tree using the hash construction defined by RFC 6962 — Certificate Transparency type — over the 46 artifacts of the Shadow Run.</p><table class="kt"><colgroup><col style="width:38%"><col style="width:62%"></colgroup><thead><tr><th>Item</th><th>Value</th></tr></thead><tbody>
+<tr><td>Merkle root</td><td><span class='hash'>5200d0cdb4597394c0d40f4b75bb7365c216404c9522d4432b89f7d311709a81</span></td></tr>
+<tr><td>Depth</td><td>6</td></tr>
+<tr><td>Leaves</td><td>46</td></tr>
+<tr><td>Inclusion proofs verified</td><td>46 / 46</td></tr>
+<tr><td>Path for bbbp/bbbp.parquet</td><td>6 nodes</td></tr>
+</tbody></table><p class="body-text">Membership of an artifact in the set is verified with six hashes, without transmitting the other forty-five.</p>
+</section>
+
+<section id="sec-04-modele-de-confiance">
+ <div class="sec-eyebrow"><span class="sec-num">04</span><span class="sec-title">Trust Model</span><a class="plink" href="#sec-04-modele-de-confiance" aria-label="Permalink">#</a></div>
+ <div class="sec-rule"></div>
+<table class="kt"><colgroup><col style="width:34%"><col style="width:66%"></colgroup><thead><tr><th>Item</th><th>Status</th></tr></thead><tbody>
+<tr><td>Execution environment</td><td>the evaluator's own, fresh, under its exclusive control</td></tr>
+<tr><td>Input data</td><td>downloaded by the evaluator from a third-party public source</td></tr>
+<tr><td>Code executed</td><td>pandas, PyArrow, numpy — public open-source libraries<span class="l2">No proprietary Kairos component</span></td></tr>
+<tr><td>Prior trust required</td><td>none</td></tr>
+<tr><td>Access to Kairos systems</td><td>none</td></tr>
+<tr><td>Proprietary Kairos code</td><td>none</td></tr>
+<tr><td>Verifiability</td><td>verifier published under the Apache 2.0 license, published hash</td></tr>
+</tbody></table><p class="body-text">The verifiable element is not the script, but the cryptographic continuity between an artifact reconstructed today from a public source and a hash recorded several weeks earlier.</p><p class="body-text"><b>Public verifier</b> — <a class="klink" href="https://github.com/KAIROSSYSTEMSCH/KAIROS-VERIFIER" target="_blank" rel="noopener noreferrer">https://github.com/KAIROSSYSTEMSCH/KAIROS-VERIFIER</a></p>
+</section>
+
+<section id="sec-05-perimetre-de-validite-declare">
+ <div class="sec-eyebrow"><span class="sec-num">05</span><span class="sec-title">Declared Scope of Validity</span><a class="plink" href="#sec-05-perimetre-de-validite-declare" aria-label="Permalink">#</a></div>
+ <div class="sec-rule"></div>
+<p class="body-text">The results claimed in this demonstration are limited to the execution conditions explicitly described below.</p><div class="pg">
+<p>Two distinct envelopes apply, to two different objects.</p>
+<p>Acts 1 and 2 do not measure the same thing and do not carry the same dependencies.</p>
+</div><div class="sub-title">Envelope A — digital substrate, Act 1</div>
+<pre class="code">numpy==2.2.6  pandas==2.3.3  xgboost==3.2.0
+OPENBLAS_CORETYPE=Haswell
+OMP_NUM_THREADS=1  MKL_NUM_THREADS=1  OPENBLAS_NUM_THREADS=1
+PYTHONHASHSEED=0</pre><div class="sub-title">Envelope B — artifact reconstruction, Act 2</div>
+<pre class="code">pandas==1.5.3  pyarrow==23.0.0  numpy&lt;2</pre><div class="pg">
+<p>The two differ for a measured reason.</p>
+<p>The Parquet format embeds the versions of the writing libraries in the bytes of the resulting file.</p>
+<p>The artifact recorded on 2026-06-06 carries created_by:</p>
+<p>parquet-cpp-arrow version 23.0.0 and pandas_version: 1.5.3.</p>
+<p>Reconstructing it identically therefore requires these exact versions.</p>
+</div><div class="pg">
+<p>Every element of these envelopes is a declared, controlled variable.</p>
+<p>Outside these envelopes, byte-identical reproducibility is not claimed.</p>
+</div><div class="sub-title">Environments on Which Envelope A Was Verified</div>
+<table class="kt"><colgroup><col style="width:22%"><col style="width:26%"><col style="width:26%"><col style="width:14%"><col style="width:12%"></colgroup><thead><tr><th>Provider</th><th>Processor</th><th>System</th><th>Python</th><th>Result</th></tr></thead><tbody>
+<tr><td>Scaleway France</td><td>AMD EPYC 9555P</td><td>Ubuntu 22.04</td><td>3.10.12</td><td>11 / 11</td></tr>
+<tr><td>Microsoft Azure</td><td>AMD EPYC 9V74</td><td>Ubuntu 24.04</td><td>3.12.1</td><td>11 / 11</td></tr>
+<tr><td>Google Colab</td><td>Intel Xeon 2.20 GHz</td><td>Linux x86_64 container</td><td>3.12.13</td><td>11 / 11</td></tr>
+</tbody></table><p class="plabel">Outside the Envelope</p><p class="body-text">macOS with the Accelerate library.<br>The OPENBLAS_CORETYPE parameter does not apply there; the matrix product, level L3, diverges.<br>The other ten levels concur.</p>
+</section>
+
+<section id="sec-06-limites-declarees">
+ <div class="sec-eyebrow"><span class="sec-num">06</span><span class="sec-title">Declared Limitations</span><a class="plink" href="#sec-06-limites-declarees" aria-label="Permalink">#</a></div>
+ <div class="sec-rule"></div>
+<p class="body-text">The demonstration addresses a specific objective; it does not claim to demonstrate more.</p><pre class="code">· Act 2 covers one artifact from the corpus. The other artifacts have not
+ been the subject of a replay on a third-party environment.
+· The consolidation and sealing phases are not replayed during
+ the demonstration.
+· The Merkle root 5200d0cd is computed and its 46 inclusion proofs are
+ verified. The document carrying it was given a technical RFC 3161
+ timestamp on 2026-07-17, from a timestamping authority not
+ qualified under eIDAS / ZertES. This timestamp establishes a technical
+ priority date; it does not constitute a qualified timestamp.
+· No certification by a third-party body is held to date.
+· The reconstruction covered one artifact from the corpus. Its validation by an
+ independent third party, on its own environment, constitutes the next step.</pre><p class="body-text">No element of this document constitutes a warranty, a certification, or regulatory evidence.</p>
+</section>
+
+<section id="sec-07-tests-complementaires-possibles">
+ <div class="sec-eyebrow"><span class="sec-num">07</span><span class="sec-title">Additional Possible Tests</span><a class="plink" href="#sec-07-tests-complementaires-possibles" aria-label="Permalink">#</a></div>
+ <div class="sec-rule"></div>
+<div class="pg">
+<p>The following tests can be carried out as an extension of the demonstration.</p>
+<p>They have not been executed to date and are not among the evidence in this dossier.</p>
+</div><pre class="code">· Tampering test: modification of one byte of the source file and observation
+ of the resulting hash.
+· Replay of a second artifact from the corpus.
+· Replay on the evaluator's own infrastructure, with its own data.</pre>
+</section>
+
+<section id="sec-08-proprietes-de-detection-du-dispositif">
+ <div class="sec-eyebrow"><span class="sec-num">08</span><span class="sec-title">Detection Properties of the System</span><a class="plink" href="#sec-08-proprietes-de-detection-du-dispositif" aria-label="Permalink">#</a></div>
+ <div class="sec-rule"></div>
+<table class="kt"><colgroup><col style="width:28%"><col style="width:12%"><col style="width:60%"></colgroup><thead><tr><th>Event</th><th>Detected</th><th>Mechanism</th></tr></thead><tbody>
+<tr><td>Modification of an artifact in the corpus</td><td>Yes</td><td>the SHA-256 hash diverges<span class="l2">the leaf no longer matches the recorded one</span></td></tr>
+<tr><td>Modification of the hash ledger</td><td>Yes</td><td>the aggregate hash and the Merkle root diverge</td></tr>
+<tr><td>Modification of an inclusion proof</td><td>Yes</td><td>recomputing the path no longer reconstructs the root</td></tr>
+<tr><td>Substitution of a source dataset</td><td>Yes</td><td>the input file's hash diverges from the public source</td></tr>
+<tr><td>Execution on a different environment</td><td>Yes</td><td>byte-identical result within the envelope,<span class="l2">divergence outside the envelope</span></td></tr>
+<tr><td>Reconstruction of git history</td><td>No effect</td><td>the anchors are SHA-256 hashes and a timestamp,<span class="l2">not commit identifiers</span></td></tr>
+<tr><td>Loss of a Kairos server</td><td>No effect</td><td>the verifier is public, the dataset is public, the hashes are published</td></tr>
+<tr><td>Modification of the verifier itself</td><td>Yes</td><td>its SHA-256 hash is published and checked before execution</td></tr>
+</tbody></table><div class="pg">
+<p class="plabel">NOT COVERED</p>
+<p>This system detects tampering with an artifact; it does not prevent it.</p>
+<p>It does not establish the functional correctness of the pipeline, nor conformity to a standard.</p>
+</div>
+</section>
+
+<section id="sec-08bis-ce-que-demontre-cette-demonstration">
+ <div class="sec-eyebrow"><span class="sec-num">08bis</span><span class="sec-title">What This Demonstration Proves</span><a class="plink" href="#sec-08bis-ce-que-demontre-cette-demonstration" aria-label="Permalink">#</a></div>
+ <div class="sec-rule"></div>
+<table class="kt"><colgroup><col style="width:38%"><col style="width:32%"><col style="width:30%"></colgroup><thead><tr><th>Proves</th><th>Does Not Prove</th><th>Conditional On</th></tr></thead><tbody>
+<tr><td>Reproducibility<span class="l2">OF ONE ARTIFACT</span></td><td>the scientific correctness of the result</td><td>the declared envelope</td></tr>
+<tr><td>Cryptographic continuity<span class="l2">OVER TIME</span></td><td>a certification</td><td>the fixed library versions</td></tr>
+<tr><td>Independent verification<span class="l2">BY A THIRD PARTY</span></td><td>regulatory compliance</td><td>use of the public verifier</td></tr>
+</tbody></table>
+</section>
+
+<section id="sec-09-conclusion">
+ <div class="sec-eyebrow"><span class="sec-num">09</span><span class="sec-title">Conclusion</span><a class="plink" href="#sec-09-conclusion" aria-label="Permalink">#</a></div>
+ <div class="sec-rule"></div>
+<div class="pg">
+<p>This demonstration rests on a simple principle.</p>
+<p>The results can be verified independently, with no access to Kairos systems.</p>
+<p>The evaluator verifies, on its own infrastructure, that an artifact reconstructed from a public source matches exactly a hash recorded several weeks earlier.</p>
+</div><div class="pg">
+<p>The verifier is public.</p>
+<p>The scope of validity is declared.</p>
+<p>The expected hashes are published.</p>
+</div><div class="sub-title red">Proposed Next Step</div>
+<p class="body-text">The natural extension of this demonstration is an independent validation on a partner's infrastructure, followed by an operational pilot on its own data — each pilot producing its own audit trail.</p>
+</section>
+
+<section style="margin-top:36px;">
+ <div class="doc-tech-flag">TECHNICAL DOSSIER FOR THE DEMONSTRATION — RESERVED FOR THE EVALUATING PARTNER</div>
+ <p class="body-text">This part provides the measurements, commands, and hashes supporting the three acts.</p>
+</section>
+
+<section id="sec-e2-rejeu-d-un-artefact-sur-environnement-tiers">
+ <div class="sec-eyebrow"><span class="sec-num">10</span><span class="sec-title">Replay of an Artifact on a Third-Party Environment</span><a class="plink" href="#sec-e2-rejeu-d-un-artefact-sur-environnement-tiers" aria-label="Permalink">#</a></div>
+ <div class="sec-rule"></div>
+<div class="sub-title">3.1 Purpose</div>
+<p class="body-text">To establish that an artifact from the Kairos corpus, whose hash was recorded on 2026-06-06, is byte-for-byte reconstructible on a third-party environment, from a public source, using exclusively public resources.</p><div class="sub-title">3.2 Data Source</div>
+<pre class="code">curl -sL -o BBBP.csv https://deepchemdata.s3.us-west-1.amazonaws.com/datasets/BBBP.csv
+sha256sum BBBP.csv
+d07a38487aeac5cee5508413e468043ef3097451d2a112701c2d60be9ec6b662 BBBP.csv</pre><p class="body-text">Comparison with the Kairos corpus file, performed on instance B</p><pre class="code">sha256sum fichier_public.csv corpus_kairos/BBBP.csv
+diff -q fichier_public.csv corpus_kairos/BBBP.csv &amp;&amp; echo "&gt;&gt;&gt; IDENTICAL"
+
+d07a38487aeac5cee5508413e468043ef3097451d2a112701c2d60be9ec6b662 fichier_public.csv
+d07a38487aeac5cee5508413e468043ef3097451d2a112701c2d60be9ec6b662 corpus_kairos/BBBP.csv
+&gt;&gt;&gt; IDENTICAL</pre><div class="pg">
+<p class="plabel">CRYPTOGRAPHIC MATCH ESTABLISHED</p>
+<p>The Kairos corpus input file and the file downloaded from DeepChem's public hosting bear the same SHA-256 hash.</p>
+<p>This match is an observed cryptographic identity.</p>
+<p>It does not legally establish provenance.</p>
+</div><div class="sub-title">3.3 Execution Environment</div>
+<table class="kt"><colgroup><col style="width:34%"><col style="width:66%"></colgroup><thead><tr><th>Item</th><th>Value</th></tr></thead><tbody>
+<tr><td>Provider</td><td>Microsoft Azure — GitHub Codespaces</td></tr>
+<tr><td>Processor</td><td>AMD EPYC 9V74 80-Core</td></tr>
+<tr><td>System</td><td>Ubuntu 24.04</td></tr>
+<tr><td>Python</td><td>3.10.20</td></tr>
+<tr><td>pandas</td><td>1.5.3</td></tr>
+<tr><td>pyarrow</td><td>23.0.0</td></tr>
+<tr><td>numpy</td><td>1.26.4</td></tr>
+<tr><td>Virtual environment</td><td>created for this run, not reused</td></tr>
+</tbody></table><div class="sub-title">3.4 Commands Executed</div>
+<pre class="code">uv venv --python 3.10 env310
+uv pip install --python env310/bin/python "pyarrow==23.0.0" "pandas==1.5.3" "numpy&lt;2"
+curl -sL -o BBBP.csv https://deepchemdata.s3.us-west-1.amazonaws.com/datasets/BBBP.csv
+sha256sum BBBP.csv
+env310/bin/python -c "
+import pandas as pd, pyarrow as pa, pyarrow.parquet as pq, hashlib
+print('pandas', pd.__version__, '| pyarrow', pa.__version__)
+df = pd.read_csv('BBBP.csv', low_memory=False)
+print('rows:', len(df))
+t = pa.Table.from_pandas(df)
+pq.write_table(t, 'bbbp.parquet', compression='snappy')
+h = hashlib.sha256(open('bbbp.parquet','rb').read()).hexdigest()
+print('obtained:', h)
+"</pre><div class="pg">
+<p>The three transformation instructions reproduce, from public libraries, the processing performed by the Kairos production pipeline.</p>
+<p>No proprietary code is executed during the replay.</p>
+</div><div class="sub-title">3.5 Output</div>
+<pre class="code">Installed 6 packages
+ + numpy==1.26.4
+ + pandas==1.5.3
+ + pyarrow==23.0.0
+ + python-dateutil==2.9.0.post0
+ + pytz==2026.2
+ + six==1.17.0
+d07a38487aeac5cee5508413e468043ef3097451d2a112701c2d60be9ec6b662 BBBP.csv
+pandas 1.5.3 | pyarrow 23.0.0
+rows : 2050
+obtained : 4621ac8d5d4a728a169fb4d5b8c35682b954928a019d575e3eca140cd563489f
+sealed   : 4621ac8d5d4a728a169fb4d5b8c35682b954928a019d575e3eca140cd563489f
+&gt;&gt;&gt; MATCH</pre><div class="sub-title">3.6 Historical Reference</div>
+<p class="body-text">Ledger <span class="hash">Merkle_Proofs_20260606T130009Z.json</span>, section RUN_1 / leaf_hashes</p><pre class="code">"BBBP/BBBP.parquet": "4621ac8d5d4a728a169fb4d5b8c35682b954928a019d575e3eca140cd563489f"
+"bbbp/bbbp.parquet": "4621ac8d5d4a728a169fb4d5b8c35682b954928a019d575e3eca140cd563489f"</pre><div class="pg">
+<p>Verification of the artifact's persistence on instance B, 2026-07-16.</p>
+<p>The artifact present on the instance is byte-identical to the one recorded six weeks earlier.</p>
+</div><div class="sub-title">3.7 Pipeline Envelope</div>
+<div class="pg">
+<p>The Parquet format embeds the versions of the writing libraries in the resulting file.</p>
+<p>Metadata extracted from the recorded artifact</p>
+</div><pre class="code">created_by  : parquet-cpp-arrow version 23.0.0
+num_rows    : 2050 | row_groups: 1
+format_ver  : 2.6
+SCHEMA KEY  : pandas
+  pandas_version = 1.5.3
+  library = pyarrow
+  version = 23.0.0
+compression : SNAPPY
+dictionary  : True
+statistics  : True</pre><div class="pg">
+<p class="plabel">CONSEQUENCE</p>
+<p>pyarrow==23.0.0 and pandas==1.5.3 are constituent elements of the pipeline envelope.</p>
+<p>Replaying the experiment with other versions produces a different hash.</p>
+</div><div class="sub-title">3.8 Conclusion E2</div>
+<pre class="code">DEMONSTRATED
+ An artifact from the Kairos corpus, recorded on 2026-06-06, is reconstructible
+ byte for byte on a third-party environment, from the original public source,
+ within the declared envelope, using exclusively public resources.
+ The artifact present on the instance is byte-identical to the one recorded six
+ weeks earlier.
+
+NOT DEMONSTRATED
+ The experiment covers one artifact from the corpus. The other artifacts have not
+ been the subject of a replay on a third-party environment.
+ The consolidation and sealing phases are not replayed.
+ Validation by an independent third party, on its own environment,
+ constitutes the next step.</pre>
+</section>
+
+<section id="sec-e3-arbre-de-merkle-rfc-6962">
+ <div class="sec-eyebrow"><span class="sec-num">11</span><span class="sec-title">Merkle Tree — RFC 6962</span><a class="plink" href="#sec-e3-arbre-de-merkle-rfc-6962" aria-label="Permalink">#</a></div>
+ <div class="sec-rule"></div>
+<div class="sub-title">4.1 Purpose</div>
+<div class="pg">
+<p>To build, from the 46 artifact SHA-256 hashes of the 2026-06-06 Shadow Run, a Merkle tree following the RFC 6962 hash construction, and to verify its inclusion proofs.</p>
+<p>The leaves are not modified: they are the SHA-256 hashes of the recorded artifacts.</p>
+<p>Only the aggregation changes.</p>
+</div><div class="sub-title">4.2 Specification</div>
+<pre class="code">Construction  RFC 6962 hash construction, Certificate Transparency type
+Leaf          SHA256(0x00 || sha256_of_parquet)   domain separation
+Node          SHA256(0x01 || left || right)
+Odd node      promoted to the next level, no duplication — CVE-2012-2459
+Order         sorted(keys), lexicographic, explicit</pre><div class="sub-title">4.3 Execution Traceability</div>
+<table class="kt"><colgroup><col style="width:34%"><col style="width:66%"></colgroup><thead><tr><th>Item</th><th>Value</th></tr></thead><tbody>
+<tr><td>Script</td><td>kairos_merkle.py</td></tr>
+<tr><td>Script SHA-256</td><td><span class='hash'>ebb80d0b9d8852e65d2995b78de725184eaff09b2391276dc8460b98c39b542a</span></td></tr>
+<tr><td>Pre-execution manifest</td><td>MERKLE_PRE_EXECUTION_MANIFEST.json</td></tr>
+<tr><td>Manifest SHA-256</td><td><span class='hash'>78034206d515f67157a003f53eecadf9c093252c60ad83f6a8a5795ce0c14c53</span></td></tr>
+<tr><td>Input file</td><td>Merkle_Proofs_20260606T130009Z.json</td></tr>
+<tr><td>Input SHA-256</td><td><span class='hash'>e482ba3c578f25f34719708237dd2898411a70cf351479a9b5425669bc7fea03</span></td></tr>
+<tr><td>Python</td><td>3.10.12</td></tr>
+<tr><td>Host</td><td>reference instance</td></tr>
+<tr><td>Operator</td><td>Karim Ben Geloun</td></tr>
+<tr><td>System timestamp</td><td>2026-07-17T03:23:49Z</td></tr>
+</tbody></table><div class="pg">
+<p class="plabel">TRACEABILITY NOTE</p>
+<p>The repository's history was reconstructed on 2026-07-17, as part of a security remediation.</p>
+<p>Commit ebbea137 and tag merkle-v1.0 no longer appear in the current history and are retained as historical references.</p>
+<p>The pre-execution manifest is not modified: it is annotated.</p>
+<p>The instrument present in the current repository bears the same hash as the one recorded prior to execution.</p>
+<p>Cryptographic verification does not depend on git history.</p>
+</div><div class="sub-title">4.4 Leaf Authenticity Check</div>
+<p class="body-text">Before construction, the script recomputes the sorted concatenation of the 46 hashes and compares it to the aggregate hash recorded on 2026-06-06. On any discrepancy, execution halts.</p><pre class="code">leaves            : 46
+set digest recomputed : ac40fe6cf8fd5cad9a8c262726f1f77cf50038d8bc52761f4b0405a568f55b66
+set digest sealed      : ac40fe6cf8fd5cad9a8c262726f1f77cf50038d8bc52761f4b0405a568f55b66
+&gt;&gt;&gt; MATCH — leaves authenticated</pre><div class="sub-title">4.5 Output</div>
+<pre class="code">depth             : 6
+MERKLE ROOT       : 5200d0cdb4597394c0d40f4b75bb7365c216404c9522d4432b89f7d311709a81
+proofs verified   : 46/46 all valid
+
+example bbbp/bbbp.parquet
+ index            : 19
+ path             : 6 nodes vs 46 hashes
+
+-&gt; KAIROS_MERKLE_TREE_20260717.json</pre><div class="pg vals">
+<p class="plabel">FILE PRODUCED</p>
+<p>KAIROS_MERKLE_TREE_20260717.json</p>
+<p>SHA-256 <span class='hash'>1b6a17f0e70df51d875e9f22a2630af0d2e129ef9b2ce3b0a7567c16c443cdfc</span></p>
+</div><p class="body-text">The 46 inclusion proofs were individually verified by recomputing the path up to the root.</p><div class="sub-title">4.6 Conclusion E3</div>
+<pre class="code">DEMONSTRATED
+ A Merkle tree compliant with RFC 6962 is built on the 46 artifact hashes
+ of the 2026-06-06 Shadow Run. The leaves are authenticated.
+ The 46 inclusion proofs are verified. Membership of an artifact is
+ verified with 6 nodes instead of 46 hashes.</pre><div class="pg">
+<p class="plabel">ACTUAL TIMESTAMP STATUS</p>
+<p>An RFC 3161 timestamp was applied on 2026-07-17 04:43:24 GMT to the document KAIROS_MERKLE_TREE_20260717.json, Serial 0x06477003, Status Granted, SHA-256.</p>
+<p>Authority — O=Free TSA, CN=www.freetsa.org, L=Wuerzburg, ST=Bayern, C=DE.</p>
+<p>This authority is a timestamping service not qualified under eIDAS / ZertES — no contract, no contractual liability, no accreditation.</p>
+</div><div class="pg">
+<p class="plabel">WHAT THIS TIMESTAMP ESTABLISHES</p>
+<p>A technical priority date — the document existed in this form as of 2026-07-17 04:43:24 GMT.</p>
+</div><div class="pg">
+<p class="plabel">WHAT IT DOES NOT ESTABLISH</p>
+<p>No regulatory evidentiary value, no sovereignty claim; it does not substitute for a qualified timestamp.</p>
+</div><div class="pg">
+<p class="plabel">DISTINCTION FROM THE 2026-06-06 CAMPAIGN</p>
+<p>The Shadow Run roots, root A==B c307495f, master 98966d49, were given a verifiable dual RFC 3161 timestamp.</p>
+</div><table class="kt"><colgroup><col style="width:26%"><col style="width:74%"></colgroup><thead><tr><th>Authority</th><th>Detail</th></tr></thead><tbody>
+<tr><td>Sectigo</td><td>OID 1.3.6.1.4.1.6449.2.1.1 · 2026-06-06T17:59:04Z · token <span class='hash'>1afe15f8…</span><span class="l2">US law</span></td></tr>
+<tr><td>SwissSign ZertES</td><td>OID 2.16.756.1.89.1.1.3.5 · 2026-06-06T17:59:04Z · token <span class='hash'>c3dce345…</span><span class="l2">qualified authority · Swiss law</span></td></tr>
+</tbody></table><pre class="code">openssl ts -verify -data audit_bundle.txt -in sectigo.tsr  → OK
+openssl ts -verify -data audit_bundle.txt -in swisssign.tsr → OK</pre><p class="body-text">→ ENQ-02 — migration to a dual qualified European anchor for the Merkle root and for V10, SwissSign + independent EU QTSP, Sectigo falling under US law.</p><div class="pg">
+<p class="plabel">SCOPE</p>
+<p>The tree is an aggregation artifact built on the leaves of the 2026-06-06 campaign.</p>
+<p>It does not modify these leaves and does not substitute for the timestamped records of that campaign, which remain valid for their version.</p>
+</div>
+</section>
+
+<section id="sec-06-durees-mesurees">
+ <div class="sec-eyebrow"><span class="sec-num">B.1</span><span class="sec-title">Measured Durations</span><a class="plink" href="#sec-06-durees-mesurees" aria-label="Permalink">#</a></div>
+ <div class="sec-rule"></div>
+<table class="kt"><colgroup><col style="width:20%"><col style="width:48%"><col style="width:22%"><col style="width:10%"></colgroup><thead><tr><th>Duration</th><th>Operation</th><th>Source</th><th>Date</th></tr></thead><tbody>
+<tr><td>5.1 S<span class="l2">MEDIAN 5.17 S</span></td><td>verification, multi-jurisdiction validation<span class="l2">EU / FDA / CH</span><span class="l2">sealing of 9,672,750 rows</span><span class="l2">measured on Kairos infrastructure</span></td><td>12 runs<span class="l2">4 sessions</span></td><td class="nowrap" style="overflow-wrap:normal;word-break:normal;">2026-06-06</td></tr>
+</tbody></table><p class="body-text">Individual values across the 12 runs, in seconds — 5.104 · 5.127 · 5.136 · 5.139 · 5.148 · 5.173 · 5.178 · 5.184 · 5.224 · 5.227 · 6.348 · 9.715. The last two correspond to the first runs of each session.</p><div class="pg">
+<p>This duration covers the verification, validation, and sealing chain.</p>
+<p>It does not cover construction of the corpus, a distinct and earlier operation.</p>
+</div>
+</section>
+
+<section id="sec-05-decompte-des-artefacts">
+ <div class="sec-eyebrow"><span class="sec-num">B.2</span><span class="sec-title">Artifact Count</span><a class="plink" href="#sec-05-decompte-des-artefacts" aria-label="Permalink">#</a></div>
+ <div class="sec-rule"></div>
+<table class="kt"><colgroup><col style="width:34%"><col style="width:14%"><col style="width:52%"></colgroup><thead><tr><th>Quantity</th><th>Value</th><th>Source</th></tr></thead><tbody>
+<tr><td>Source data directories</td><td>14</td><td>filesystem, instance B</td></tr>
+<tr><td>Entries in the normalized/ directory</td><td>47</td><td>including phase1_report.json, a file, not a directory</td></tr>
+<tr><td>Artifact directories</td><td>46</td><td>—</td></tr>
+<tr><td>Recorded artifacts</td><td>46</td><td>leaf_hashes = 46 · dataset_count = 46</td></tr>
+<tr><td>Unique datasets</td><td>45</td><td>BBBP normalized under two directory names</td></tr>
+<tr><td>Merkle tree leaves</td><td>46</td><td>—</td></tr>
+</tbody></table><p class="body-text">The two BBBP artifacts — BBBP/BBBP.parquet and bbbp/bbbp.parquet — are byte-identical and originate from the same source file. The directory name does not enter into the hash computation.</p><p class="body-text">Applicable wording — <b>46 recorded artifacts</b>.</p>
+</section>
+
+<section style="margin-top:36px;">
+ <div class="doc-tech-flag">ANNEX — EVIDENCE REGISTER</div>
+ <div class="sec-rule"></div>
+ <div class="kv">
+ <div class="row"><div class="k">Instance B</div><div class="v">reference instance — Scaleway, France</div></div><div class="row"><div class="k">Instance A</div><div class="v">Infomaniak, Switzerland — A←B reconciliation planned</div></div>
+ <div class="row"><div class="k">Register</div><div class="v">MASTER_EVIDENCE_REGISTER</div></div>
+ <div class="row"><div class="k">Manifest</div><div class="v">MANIFEST_SHA256.txt — 25 active exhibits as of 2026-07-25</div></div>
+ <div class="row"><div class="k">Public repository</div><div class="v"><a class="klink" href="https://github.com/KAIROSSYSTEMSCH/KAIROS-VERIFIER" target="_blank" rel="noopener noreferrer">https://github.com/KAIROSSYSTEMSCH/KAIROS-VERIFIER</a></div></div>
+ </div>
+</section>
+
+<section id="sec-a-3-table-de-correspondance-affirmation-piece-empreinte">
+ <div class="sec-eyebrow"><span class="sec-num">A.3</span><span class="sec-title">Correspondence Table — Claim → Exhibit → Hash</span><a class="plink" href="#sec-a-3-table-de-correspondance-affirmation-piece-empreinte" aria-label="Permalink">#</a></div>
+ <div class="sec-rule"></div>
+<div class="sub-title">3.1 Digital Substrate Envelope — VERIFIER §2</div>
+<table class="kt"><colgroup><col style="width:36%"><col style="width:40%"><col style="width:24%"></colgroup><thead><tr><th>Claim</th><th>Exhibit</th><th>Status</th></tr></thead><tbody>
+<tr><td>Declared envelope<span class="l2">11/11 ACROSS 3 ENVIRONMENTS</span></td><td>MEASUREMENT_LOG_20260716.md<span class="l2"><span class='hash'>cdba4b96…</span></span></td><td>CHECKED</td></tr>
+<tr><td>Output E1-A<span class="l2">SCALEWAY, AMD EPYC 9555P</span></td><td>ladder_scaleway_EPYC9555P_haswell.txt<span class="l2"><span class='hash'>f846af82…</span></span></td><td>CHECKED</td></tr>
+<tr><td>Output E1-B<span class="l2">AZURE, AMD EPYC 9V74</span></td><td>ladder_azure_EPYC9V74_haswell.txt<span class="l2"><span class='hash'>0c76b86d…</span></span></td><td>REPRODUCED<span class="l2">TRANSCRIPTION</span></td></tr>
+<tr><td>Output E1-C<span class="l2">GOOGLE COLAB, INTEL XEON</span></td><td>ladder_colab_IntelXeon_haswell.txt<span class="l2"><span class='hash'>55bae0e6…</span></span></td><td>REPRODUCED TRANSCRIPTION<span class="l2">ENQ-01 CLOSED</span></td></tr>
+<tr><td>Measurement instrument</td><td>determinism_ladder.py<span class="l2"><span class='hash'>e4c685ae…</span></span></td><td>CHECKED<span class="l2">FRESH CLONE</span><span class="l2">3 ENVIRONMENTS</span></td></tr>
+</tbody></table><div class="pg">
+<p class="plabel">TRACEABILITY NOTE</p>
+<p>Exhibits E1-B and E1-C are transcriptions of outputs obtained on ephemeral environments — GitHub Codespaces, Google Colab — recorded on instance B on 2026-07-16.</p>
+</div><div class="sub-title">3.2 Replay on a Third-Party Environment — VERIFIER §3</div>
+<table class="kt"><colgroup><col style="width:36%"><col style="width:40%"><col style="width:24%"></colgroup><thead><tr><th>Claim</th><th>Exhibit</th><th>Status</th></tr></thead><tbody>
+<tr><td>Public source<span class="l2">BBBP DATASET</span></td><td>deepchemdata.s3…/BBBP.csv<span class="l2"><span class='hash'>d07a3848…</span></span></td><td>CHECKED<span class="l2">DOWNLOADED</span><span class="l2">2026-07-16</span></td></tr>
+<tr><td>Input file<span class="l2">KAIROS CORPUS</span></td><td>Kairos corpus — BBBP.csv<span class="l2"><span class='hash'>d07a3848…</span></span></td><td>IDENTICAL TO THE PUBLIC SOURCE</td></tr>
+<tr><td>Artifact produced on a third-party environment</td><td>Codespaces AMD EPYC 9V74<span class="l2"><span class='hash'>4621ac8d…</span></span></td><td>REPRODUCED<span class="l2">SEE ENQ-03</span></td></tr>
+<tr><td>Recorded artifact<span class="l2">ON 2026-06-06</span></td><td>Merkle_Proofs_20260606T130009Z.json<span class="l2"><span class='hash'>4621ac8d…</span></span></td><td>CHECKED</td></tr>
+<tr><td>Pipeline envelope<span class="l2">EMBEDDED IN THE PARQUET FILE</span></td><td>created_by=parquet-cpp-arrow 23.0.0<span class="l2">pandas_version=1.5.3</span></td><td>CHECKED</td></tr>
+<tr><td>Transformation code</td><td>Kairos production pipeline</td><td>CHECKED</td></tr>
+</tbody></table><div class="sub-title">3.3 Merkle Tree — RFC 6962 — VERIFIER §4</div>
+<table class="kt"><colgroup><col style="width:36%"><col style="width:40%"><col style="width:24%"></colgroup><thead><tr><th>Claim</th><th>Exhibit</th><th>Status</th></tr></thead><tbody>
+<tr><td>Construction result</td><td>KAIROS_MERKLE_TREE_20260717.json<span class="l2"><span class='hash'>1b6a17f0…</span></span></td><td>CHECKED</td></tr>
+<tr><td>Pre-execution manifest</td><td class="nowrap" style="overflow-wrap:normal;word-break:normal;">MERKLE_PRE_EXECUTION_MANIFEST.json<span class="l2"><span class='hash'>78034206…</span></span></td><td>CHECKED</td></tr>
+<tr><td>Construction instrument</td><td>kairos_merkle.py<span class="l2"><span class='hash'>ebb80d0b…</span></span></td><td>CHECKED<span class="l2">HASH RECORDED</span><span class="l2">BEFORE EXECUTION</span></td></tr>
+<tr><td>RFC 3161 timestamp token</td><td>KAIROS_MERKLE_TREE_20260717.tsr<span class="l2"><span class='hash'>ebd8e8c9…</span></span></td><td>UNQUALIFIED TSA<span class="l2">FREE TSA DE</span><span class="l2">SERIAL 0X06477003</span></td></tr>
+<tr><td>Computed root</td><td>5200d0cdb4597394c0d40f4b75bb7365c216404c9522d4432b89f7d311709a81</td><td>COMPUTED<span class="l2">NOT QUALIFIED</span><span class="l2">EIDAS/ZERTES</span><span class="l2">ENQ-02</span></td></tr>
+<tr><td>Aggregate hash reproduced</td><td>recomputed before construction<span class="l2"><span class='hash'>ac40fe6c…</span></span></td><td>REPRODUCED IDENTICAL<span class="l2">RECORDING</span><span class="l2">06/06/2026</span></td></tr>
+</tbody></table><div class="sub-title">3.4 Artifact Count — VERIFIER §5</div>
+<table class="kt"><colgroup><col style="width:36%"><col style="width:40%"><col style="width:24%"></colgroup><thead><tr><th>Claim</th><th>Exhibit</th><th>Status</th></tr></thead><tbody>
+<tr><td>46 recorded artifacts<span class="l2">45 UNIQUE DATASETS</span></td><td>FIND_20260716_46vs47.md, rev. 2<span class="l2"><span class='hash'>76ae301d…</span></span></td><td>CHECKED</td></tr>
+<tr><td>Merkle consistency<span class="l2">LEAF_HASHES = 46</span><span class="l2">DATASET_COUNT = 46</span></td><td>Merkle_Proofs_20260606T130009Z.json</td><td>CHECKED</td></tr>
+<tr><td>47 normalized entries<span class="l2">INCLUDING PHASE1_REPORT.JSON</span></td><td>filesystem inspection, instance B</td><td>CHECKED</td></tr>
+</tbody></table><div class="sub-title">3.7 Dual Timestamp of the 2026-06-06 Shadow Run — VERIFIER §4.6</div>
+<table class="kt"><colgroup><col style="width:36%"><col style="width:40%"><col style="width:24%"></colgroup><thead><tr><th>Claim</th><th>Exhibit</th><th>Status</th></tr></thead><tbody>
+<tr><td>Timestamped bundle<span class="l2">ROOTS A==B AND MASTER</span></td><td>audit_bundle.txt<span class="l2"><span class='hash'>c0a1be30…</span></span></td><td>REPRODUCED<span class="l2">RECONSTRUCTED</span><span class="l2">IDENTICAL</span><span class="l2">2026-07-18</span></td></tr>
+<tr><td>Sectigo token</td><td>sectigo.tsr<span class="l2"><span class='hash'>1afe15f8…</span></span></td><td>CHECKED<span class="l2">TS -VERIFY OK</span></td></tr>
+<tr><td>SwissSign ZertES token, qualified</td><td>swisssign.tsr<span class="l2"><span class='hash'>c3dce345…</span></span></td><td>CHECKED<span class="l2">TS -VERIFY OK</span></td></tr>
+<tr><td>Phase 9 attestation<span class="l2">INSTANCE B</span></td><td>FINAL_PHASE9_ATTESTATION.json<span class="l2"><span class='hash'>06fd67ac…</span></span></td><td>CHECKED</td></tr>
+<tr><td>ENQ-07 finding</td><td>ENQ07_CONSTAT_20260718.md<span class="l2"><span class='hash'>f7068f88…</span></span></td><td>CHECKED</td></tr>
+</tbody></table><p class="body-text">Sub-register merkle/shadow_run_20260606/ — 11 exhibits under MANIFEST.txt.</p><div class="sub-title">3.5 Durations — VERIFIER §6 · 3.6 Public Repository</div>
+<table class="kt"><colgroup><col style="width:26%"><col style="width:50%"><col style="width:24%"></colgroup><thead><tr><th>Claim</th><th>Exhibit</th><th>Status</th></tr></thead><tbody>
+<tr><td>12 measured runs<span class="l2">MEDIAN 5.17 S</span><span class="l2">9,672,750 ROWS</span></td><td class="nowrap">phase_8_6_results/RUN_*.json<span class="l2">duration_seconds field</span></td><td>CHECKED</td></tr>
+<tr><td>Duration reconciliation</td><td class="nowrap">RAPPORT_RECONCILIATION_20260717.md §3<span class="l2"><span class='hash'>9b9eac18…</span></span></td><td>CHECKED</td></tr>
+<tr><td>Public repository</td><td>determinism_ladder.py · security.txt<span class="l2">EXPECTED_HASHES.md README.md</span><span class="l2">requirements.txt · LICENSE Apache 2.0</span></td><td>VERIFIED<span class="l2">FRESH CLONE</span><span class="l2">3 ENVIRONMENTS</span><span class="l2">2026-07-16</span></td></tr>
+</tbody></table>
+</section>
+
+<section id="sec-a-45-niveaux-de-confiance-enquetes-ouvertes">
+ <div class="sec-eyebrow"><span class="sec-num">A.4–5</span><span class="sec-title">Confidence Levels · Open Inquiries</span><a class="plink" href="#sec-a-45-niveaux-de-confiance-enquetes-ouvertes" aria-label="Permalink">#</a></div>
+ <div class="sec-rule"></div>
+<div class="sub-title">Convention</div>
+<table class="kt"><colgroup><col style="width:26%"><col style="width:74%"></colgroup><thead><tr><th>Level</th><th>Definition</th></tr></thead><tbody>
+<tr><td>Checked</td><td>hash computed and recorded on instance B</td></tr>
+<tr><td>Reproduced</td><td>result obtained by documented re-execution</td></tr>
+<tr><td>Reproduced<span class="l2">Transcription</span></td><td>output obtained on an ephemeral environment,<span class="l2">transcribed and recorded on the day of measurement</span></td></tr>
+<tr><td>Computed</td><td>value produced by a traced instrument, not timestamped by a qualified authority</td></tr>
+<tr><td>Not performed</td><td>the operation was not executed</td></tr>
+</tbody></table><div class="sub-title">Open Inquiries</div>
+<table class="kt"><colgroup><col style="width:15%"><col style="width:48%"><col style="width:37%"></colgroup><thead><tr><th>Ref.</th><th>Subject</th><th>Impact</th></tr></thead><tbody>
+<tr><td>ENQ-01</td><td>Complete environment header<span class="l2">five in-envelope measurements</span></td><td>CLOSED on 2026-07-21</td></tr>
+<tr><td>ENQ-06</td><td>Behavior without OPENBLAS_CORETYPE<span class="l2">host without AVX-512</span></td><td>CLOSED on 2026-07-21</td></tr>
+<tr><td>ENQ-02</td><td>Migration to a dual qualified EU anchor<span class="l2">Merkle root + V10</span></td><td>In progress</td></tr>
+<tr><td>ENQ-07</td><td>Inspection of RFC 3161 tokens<span class="l2">2026-06-06 campaign</span></td><td>CLOSED on 2026-07-18</td></tr>
+<tr><td>ENQ-03</td><td>Transcription to the register<span class="l2">E2 replay output</span></td><td>Hashes verified on the instance</td></tr>
+<tr><td>ENQ-04</td><td>Screenshots<span class="l2">three demonstration acts</span></td><td>Three locations flagged</td></tr>
+<tr><td>ENQ-05</td><td>Isolation of discrepancies<span class="l2">observed on macOS</span></td><td>CLOSED on 2026-07-24<span class="l2">deviation attributable to the BLAS library, not to the numpy version</span></td></tr>
+</tbody></table><p class="body-text">Each inquiry produces an exhibit that supplements this dossier, without calling into question the DEMO and VERIFIER documents.</p>
+</section>
+
+<section id="sec-a-6-pieces-exclues-de-la-diffusion-externe">
+ <div class="sec-eyebrow"><span class="sec-num">A.6</span><span class="sec-title">Materials Excluded from External Distribution</span><a class="plink" href="#sec-a-6-pieces-exclues-de-la-diffusion-externe" aria-label="Permalink">#</a></div>
+ <div class="sec-rule"></div>
+<p class="body-text">The following items fall under the internal quality system and do not appear in any of the three documents.</p><pre class="code">deviation notes and non-conformances · operational incidents · open technical GAP items · internal audit log · correction history</pre><p class="body-text">These items are retained in the MASTER_EVIDENCE_REGISTER and are produced on request as part of a contradictory audit.</p>
+</section>
+
+<section id="sec-annexe-a-index-des-preuves-de-la-demonstration">
+ <div class="sec-eyebrow"><span class="sec-num">ANNEX A</span><span class="sec-title">Index of Demonstration Evidence</span><a class="plink" href="#sec-annexe-a-index-des-preuves-de-la-demonstration" aria-label="Permalink">#</a></div>
+ <div class="sec-rule"></div>
+<div class="pg">
+<p>Every claim in this document is backed by a verifiable exhibit, retained on instance B</p>
+<p>MASTER_EVIDENCE_REGISTER register — or published.</p>
+</div><table class="kt"><colgroup><col style="width:34%"><col style="width:32%"><col style="width:34%"></colgroup><thead><tr><th>Claim</th><th>Exhibit</th><th>SHA-256</th></tr></thead><tbody>
+<tr><td>Authenticable public verifier</td><td>determinism_ladder.py<span class="l2">public repository</span></td><td><span class='hash'>e2f6cd4b…</span></td></tr>
+<tr><td>12 measurements — 11 logical levels<span class="l2">BYTE-IDENTICAL</span><span class="l2">3 ENVIRONMENTS</span></td><td>ladder/20260716_envelope/<span class="l2">5 exhibits + MANIFEST</span></td><td>KAIROS VERIFIER public, §2</td></tr>
+<tr><td>BBBP public source</td><td>deepchemdata.s3…/BBBP.csv</td><td><span class='hash'>d07a3848…</span></td></tr>
+<tr><td>Reconstructed artifact<span class="l2">= RECORDED ARTIFACT</span></td><td>2026-06-06 register</td><td><span class='hash'>4621ac8d…</span></td></tr>
+<tr><td>Merkle tree RFC 6962, 46/46 proofs</td><td>KAIROS_MERKLE_TREE_20260717.json</td><td><span class='hash'>1b6a17f0…</span></td></tr>
+<tr><td>Verifiable dual timestamp of the 06/06/2026 Shadow Run</td><td>shadow_run_20260606/<span class="l2">11 exhibits</span></td><td>bundle <span class='hash'>c0a1be30…</span> ·<span class="l2">tokens <span class='hash'>1afe15f8…</span>/<span class='hash'>c3dce345…</span></span></td></tr>
+<tr><td>Sealing of the reproducibility kit — manifest</td><td>SHA256SUMS<span class="l2">11 exhibits + kit_*.tsr</span></td><td>manifest <span class='hash'>d68caaab…</span> ·<span class="l2">dual timestamp 2026-07-22 16:41:13 UTC, Sectigo + SwissSign, Verification: OK</span></td></tr>
+</tbody></table><p class="body-text">Verification of the dual timestamp, reproducible by a third party</p><pre class="code">openssl ts -verify -data audit_bundle.txt -in sectigo.tsr  → Verification: OK
+openssl ts -verify -data audit_bundle.txt -in swisssign.tsr → Verification: OK</pre><p class="body-text">The verifier, its source code, its usage protocol, and the expected hashes are published. The complete technical evidence dossier, KAIROS VERIFIER, is available on request.</p>
+</section>
+
+<section id="sec-artefacts">
+<div class="sec-eyebrow"><div class="sec-num">↓</div><div class="sec-title">Artifacts, Hashes &amp; Download</div><a class="plink" href="#sec-artefacts" aria-label="Permalink">#</a></div>
+<div class="sec-rule"></div>
+<p class="body-text">The kit's text files are embedded in this document: their content is <b>byte-identical</b> to that of the sealed bundle, which can be verified by recomputing their hash after download. Large binary items are provided in the archive.</p>
+
+<div class="sub-title red">Envelope Recipes</div>
+<div class="kfiles">
+<div class="kf"><div class="fn">Dockerfile</div><div class="fr">Envelope recipe — frozen Python 3.10.12 image.</div><div class="fm"><span class="ktag mit">MIT</span><span>170 B</span></div><div class="fm"><span class="hash">abec64b2…</span></div><button class="kbtn" data-dl="f-dockerfile" data-name="Dockerfile">Download</button></div>
+<div class="kf"><div class="fn">environment.yml</div><div class="fr">Envelope recipe — micromamba / conda-forge.</div><div class="fm"><span class="ktag mit">MIT</span><span>149 B</span></div><div class="fm"><span class="hash">9b04792f…</span></div><button class="kbtn" data-dl="f-env" data-name="environment.yml">Download</button></div>
+<div class="kf"><div class="fn">replay.py</div><div class="fr">Parquet reconstruction and comparison to the sealed artifact.</div><div class="fm"><span class="ktag mit">MIT</span><span>849 B</span></div><div class="fm"><span class="hash">53f9d4a6…</span></div><button class="kbtn" data-dl="f-replay" data-name="replay.py">Download</button></div>
+</div>
+
+<div class="sub-title red">Data and Artifact</div>
+<div class="kfiles">
+<div class="kf"><div class="fn">BBBP.csv</div><div class="fr">Public dataset, not redistributed: retrieve from the original source, then check by its hash.</div><div class="fm"><span class="ktag ext">external source</span><span>148,743 B</span></div><div class="fm"><span class="hash">d07a3848…</span></div><a class="kbtn" href="https://deepchemdata.s3.us-west-1.amazonaws.com/datasets/BBBP.csv" rel="noopener">Official source</a></div>
+<div class="kf"><div class="fn">bbbp.parquet</div><div class="fr">Reference sealed artifact — the value to reproduce.</div><div class="fm"><span class="ktag">archive</span><span>92,252 B</span></div><div class="fm"><span class="hash">4621ac8d…</span></div></div>
+<div class="kf"><div class="fn">audit_bundle.txt</div><div class="fr">Timestamped Shadow Run document: bears the 2026-06-06 roots.</div><div class="fm"><span class="ktag">confidential</span><span>457 B</span></div><div class="fm"><span class="hash">c0a1be30…</span></div><button class="kbtn" data-dl="f-bundle" data-name="audit_bundle.txt">Download</button></div>
+</div>
+
+<div class="sub-title red">Chain of Evidence and Timestamps</div>
+<div class="kfiles">
+<div class="kf"><div class="fn">kairos_merkle.py</div><div class="fr">RFC 6962 tree reconstruction and verification of the 46 inclusion proofs.</div><div class="fm"><span class="ktag mit">MIT</span><span class="ktag">archive</span><span>4,658 B</span></div><div class="fm"><span class="hash">ebb80d0b…</span></div></div>
+<div class="kf"><div class="fn">Merkle_Proofs_20260606T130009Z.json</div><div class="fr">Register of the 46 leaves and their inclusion proofs.</div><div class="fm"><span class="ktag">archive</span><span>16,673 B</span></div><div class="fm"><span class="hash">e482ba3c…</span></div></div>
+<div class="kf"><div class="fn">swisssign.tsr</div><div class="fr">RFC 3161 token — SwissSign, 2026-06-06.</div><div class="fm"><span class="ktag">archive</span><span>6,859 B</span></div><div class="fm"><span class="hash">c3dce345…</span></div></div>
+<div class="kf"><div class="fn">sectigo.tsr</div><div class="fr">RFC 3161 token — Sectigo, 2026-06-06.</div><div class="fm"><span class="ktag">archive</span><span>6,361 B</span></div><div class="fm"><span class="hash">1afe15f8…</span></div></div>
+<div class="kf"><div class="fn">swisssign_embedded_chain.pem</div><div class="fr">Certificate chain for verifying SwissSign tokens.</div><div class="fm"><span class="ktag">archive</span><span>8,507 B</span></div><div class="fm"><span class="hash">3b51d1bf…</span></div></div>
+</div>
+
+<div class="sub-title red">Manifest, Sealing, and Archive</div>
+<div class="kfiles">
+<div class="kf"><div class="fn">SHA256SUMS</div><div class="fr">Manifest of the 11 data exhibits.<br>This is the file that is timestamped.</div><div class="fm"><span>910 B</span></div><div class="fm"><span class="hash">d68caaab…</span></div><button class="kbtn" data-dl="f-sums" data-name="SHA256SUMS">Download</button></div>
+<div class="kf"><div class="fn">README_VERIFICATION.md</div><div class="fr">Verification procedure, text version.<br>Accompanying document, outside the sealed manifest.</div><div class="fm"><span>7,422 B</span></div><div class="fm"><span class="hash">93eefa09…</span></div><button class="kbtn" data-dl="f-readme" data-name="README_VERIFICATION.md">Download</button></div>
+<div class="kf"><div class="fn one">kit_swisssign.tsr · kit_sectigo.tsr · kit.tsq</div><div class="fr">Manifest sealing<br>— dual timestamp of 2026-07-22 16:41:13 UTC.</div><div class="fm"><span class="ktag">archive</span></div><div class="fm"><span class="hash">ca00771b…</span><span class="hash">d4902f34…</span></div></div>
+<div class="kf" style="border-color:rgba(255,0,0,.55)"><div class="fn">KAIROS_NIVEAU2_KIT.tar.gz</div><div class="fr">Complete archive: the 11 exhibits, the manifest, the sealing tokens, and the README.</div><div class="fm"><span class="ktag ext">delivery</span></div><div class="fm"><span class="hash">b5606966…</span></div><a class="kbtn p" href="KAIROS_NIVEAU2_KIT.tar.gz" download>Download the archive</a></div>
+</div>
+
+<div class="sub-title red">Provenance and Licenses</div>
+<p class="body-text"><b>Kit code</b> — <span class="hl">Dockerfile</span>, <span class="hl">environment.yml</span>, <span class="hl">replay.py</span>, and <span class="hl">kairos_merkle.py</span> are published under the MIT license. This notice is carried by this document and not inserted into the files: a license header would alter their bytes, hence their hashes, and would invalidate the sealed manifest <span class="hash">d68caaab…</span> as well as its two timestamps.</p>
+<p class="body-text"><b>BBBP dataset</b> — provenance: Martins et al. (2012), <i>A Bayesian approach to in silico blood-brain barrier penetration modeling</i>, J. Chem. Inf. Model. 52(6):1686-1697; distributed in the MoleculeNet collection and served by the public DeepChem infrastructure. The DeepChem library is MIT licensed; however, most MoleculeNet datasets <b>carry no license declaration of their own</b> and are labeled MIT by extension, which is an inference rather than a declaration by the data's author. In the absence of an explicit redistribution license, this kit does not redistribute the file: it points to the official source and publishes the expected hash, which suffices to guarantee that the evaluator is working on the same file.</p>
+</section>
+
+
+
+
+<section id="sec-journal-des-revisions">
+ <div class="sec-eyebrow"><span class="sec-num">—</span><span class="sec-title">Revision history</span><a class="plink" href="#sec-journal-des-revisions" aria-label="Permalink">#</a></div>
+ <div class="sec-rule"></div>
+<table class="kt"><colgroup><col style="width:10%"><col style="width:14%"><col style="width:76%"></colgroup><thead><tr><th>Version</th><th>Date</th><th>Subject</th></tr></thead><tbody>
+<tr><td>1.0</td><td class="nowrap">2026-07-25</td><td>First publication.<span class="l2">Part A — independent validation protocol, guided verification tool, attestation template.</span><span class="l2">Part B — chain of evidence from the public dataset to the sealed artefact, RFC 6962 Merkle tree, dual RFC 3161 timestamping.</span><span class="l2">Measurement campaign of 2026-07-21 and 2026-07-24 across five in-envelope environments. macOS x86_64 and arm64 measured outside the envelope, Apple Silicon reproduced across five runner instances on 2026-07-24 and 2026-07-25.</span></td></tr>
+</tbody></table>
+</section>
+
+<footer>
+ <div class="f-row"><span class="fk">Public verifier</span><span class="fv"><a class="klink" href="https://github.com/KAIROSSYSTEMSCH/KAIROS-VERIFIER" target="_blank" rel="noopener noreferrer">https://github.com/KAIROSSYSTEMSCH/KAIROS-VERIFIER</a></span></div>
+ <div class="f-row"><span class="fk">Verification tool</span><span class="fv">validation_externe.sh — <span class="hash">34dbeb14…c0eb750a9</span></span></div>
+ <div class="f-row"><span class="fk">Security</span><span class="fv"><a class="klink" href="https://kairossystems.ch/.well-known/security.txt" rel="noopener">https://kairossystems.ch/.well-known/security.txt</a></span></div>
+ <div class="f-row"><span class="fk">Contact</span><span class="fv">security@kairossystems.ch</span></div>
+ <div class="f-row"><span class="fk">Dossier</span><span class="fv" style="font-weight:900;">External Validation &amp; Evidence Architecture — v1.0 · 2026-07-24</span></div>
+</footer>
+</div>
+
+<script type="text/plain" id="f-attestation">
+EXTERNAL REPLAY ATTESTATION
+Kairos Systems - Aether Paris SAS
+To be reproduced on the validator's letterhead, completed from
+the attestation data file, then dated and signed.
+======================================================================
+
+AUTHOR
+------
+
+  Last name, first name            : ______________________________
+  Title                            : ______________________________
+  Company                          : ______________________________
+
+ENVIRONMENT USED
+----------------
+
+  Type                             : ______________________________
+  System                           : ______________________________
+  Processor                        : ______________________________
+  System Python                    : ______________________________
+  Execution path                   : ______________________________
+  Date and time UTC                : ______________________________
+
+DECLARATION OF INDEPENDENCE
+----------------------------
+
+I attest that the above environment is under my exclusive control, that no representative of Kairos Systems accessed it, entered any command into it, or took remote control of it at any point. I executed the tool whose hash is declared in Section 04, after checking that hash.
+
+FILE HASHES
+-----------
+
+  validation_externe.sh            : ______________________________
+  determinism_ladder.py            : ______________________________
+  BBBP.csv                         : ______________________________
+  bbbp.parquet                     : ______________________________
+
+DETERMINISM LADDER
+-------------------
+
+  Identical hashes                 : ______________________________
+  Divergent levels                 : ______________________________
+  L3 without OPENBLAS_CORETYPE     : ______________________________
+
+ARTIFACT RECONSTRUCTION
+------------------------
+
+  Envelope obtained                : ______________________________
+  Rows read                        : ______________________________
+  The hash of the reconstructed file is:   ☐ identical to the published hash    ☐ different
+
+SCOPE OF THIS ATTESTATION
+---------------------------
+
+I attest that I personally executed the operations described and observed the results recorded above.
+
+I do not attest to:
+
+  — the correctness of the Kairos Systems pipeline;
+  — the validity of artifacts other than the one I reconstructed;
+  — Kairos Systems' conformity to any standard or regulation;
+  — this artifact's membership in a sealed set, as this verification is not part of this protocol;
+  — any element I did not personally execute.
+
+This attestation constitutes an external replay. It constitutes neither an independent validation, nor a certification, nor an audit.
+
+OBSERVATIONS
+------------
+
+  ______________________________________________________
+
+SIGNATURE
+---------
+
+  Done at                          : ______________________________
+  On                               : ______________________________
+  Signature                        : ______________________________
+</script>
+<script type="text/plain" id="f-script">
+#!/usr/bin/env bash
+# =============================================================================
+# KAIROS — VÉRIFICATION GUIDÉE
+#
+# Cet outil MESURE. Il n'interprète pas.
+# Il exécute les mêmes vérifications sur toutes les plateformes, compare les
+# empreintes obtenues aux empreintes publiées, et consigne le résultat.
+# Un écart n'est pas traité comme une erreur : c'est un résultat, il est
+# enregistré tel quel et l'exécution se poursuit.
+# Seule une impossibilité technique interrompt l'exécution.
+#
+# Il n'installe rien hors du répertoire de travail, ne demande aucun droit
+# administrateur et ne modifie aucun fichier système.
+#
+# Plateformes : Linux x86_64 · macOS x86_64 · macOS arm64
+# Usage       : bash validation_externe.sh
+# Espace      : KAIROS_WORKDIR=/chemin bash validation_externe.sh  (optionnel,
+#               défaut ~/kairos_verification)
+# Effacer     : rm -rf "${KAIROS_WORKDIR:-~/kairos_verification}"
+#
+# Licence Apache 2.0 — Aether Paris SAS / Kairos Systems
+# =============================================================================
+set -u
+
+WORK="${KAIROS_WORKDIR:-$HOME/kairos_verification}"
+REPO="https://github.com/KAIROSSYSTEMSCH/KAIROS-VERIFIER.git"
+CSV_URL="https://deepchemdata.s3.us-west-1.amazonaws.com/datasets/BBBP.csv"
+
+SCRIPT_ATTENDU="e2f6cd4b4e67e98d19adbd76e9e8c12eae0276cca3755b324e55f3b966525be4"
+CSV_ATTENDU="d07a38487aeac5cee5508413e468043ef3097451d2a112701c2d60be9ec6b662"
+PARQUET_ATTENDU="4621ac8d5d4a728a169fb4d5b8c35682b954928a019d575e3eca140cd563489f"
+
+LADDER_ATTENDU="L0 1d9e01d16d6389002d78dd1a6456743273cdf2277fd781c872bc428a567ef85b
+L1 84af2aaa28305585d54e02e8de41148d894fe66faadab54f38b3727c82e78580
+L1b 9984517da6ef41ff74b85274d57301e063b46dfbce4892ea3841b19800a6785f
+L2 86ca842440c89f745a9b4aa1b0c7972fa6879c055f334b867d7cfb1ccd233f4a
+L3 60da9d0bfeb7bb992dfa73ced6bb6634840be86783f20979e44bfcfbf8906fe9
+L3b db791086e49a76e2087927d7a010666707b3945fafb71b2446164d672a8c6872
+L4 0bf4f040e2ee2721aca6e3c74d20f74198cef85ca4bba4348a7152f00e44e9b3
+L4b 9d40cfbddb0c14caadec21c852b5d6578767fb14da59ad563a70bdc8b23dcb18
+L5 687b5cae54c0f69f4bf6c54bb60d737a27b1a2c9965e577c7846e462fe976703
+L5b d36851807abf6013acd4b7be2c66f25d3ec4e82d84b6e451bf84fc1beafd38d3
+L6_mono e05c0b80de5ce5e4f092d0de2277e40bebdee593d6fc1a8c96db8ceb03effaf6
+L6_multi e05c0b80de5ce5e4f092d0de2277e40bebdee593d6fc1a8c96db8ceb03effaf6"
+
+ATT="$WORK/ATTESTATION_DATA.txt"
+CONFORMES=0
+ECARTS=0
+
+# ---------- portabilité ----------
+sha256() { # $1 fichier
+  if command -v sha256sum >/dev/null 2>&1; then sha256sum "$1" | cut -d' ' -f1
+  else shasum -a 256 "$1" | cut -d' ' -f1; fi
+}
+processeur() {
+  if [ -r /proc/cpuinfo ]; then
+    grep -m1 'model name' /proc/cpuinfo | cut -d: -f2- | sed 's/^ *//'
+  else
+    sysctl -n machdep.cpu.brand_string 2>/dev/null || echo "non déterminé"
+  fi
+}
+avx512() {
+  if [ -r /proc/cpuinfo ]; then
+    grep -qw avx512f /proc/cpuinfo && echo oui || echo non
+  else
+    v="$(sysctl -n hw.optional.avx512f 2>/dev/null || echo 0)"
+    [ "$v" = "1" ] && echo oui || echo non
+  fi
+}
+pyver_ok() { # 0 si python3 est dans l'enveloppe mesuree 3.10 a 3.12
+  python3 -c 'import sys; v=sys.version_info[:2]; sys.exit(0 if (3,10) <= v <= (3,12) else 1)' 2>/dev/null
+}
+get_micromamba() {
+  [ -x "$WORK/bin/micromamba" ] && return 0
+  mkdir -p "$WORK/bin" && cd "$WORK" || return 1
+  local url="https://github.com/mamba-org/micromamba-releases/releases/download/2.0.5-0/micromamba-${MAMBA_PLAT}"
+  local tentative
+  for tentative in 1 2 3; do
+    curl -Ls -f -o "$WORK/bin/micromamba" "$url" && break
+    sleep 2
+  done
+  [ -s "$WORK/bin/micromamba" ] || return 1
+  chmod +x "$WORK/bin/micromamba"
+  "$WORK/bin/micromamba" --version >/dev/null 2>&1
+}
+
+# ---------- présentation ----------
+sep()   { printf '%s\n' "------------------------------------------------------------------"; }
+titre() { echo; sep; printf '  %s\n' "$1"; sep; }
+etape() { printf '\n· %s\n' "$1"; }
+cmd()   { printf '  $ %s\n' "$1"; }
+note()  { printf '  %s\n' "$1"; }
+
+compare() { # $1 libellé  $2 attendu  $3 obtenu
+  printf '  attendu : %s\n  obtenu  : %s\n' "$2" "$3"
+  if [ "$2" = "$3" ]; then
+    printf '  >>> IDENTIQUE — %s\n' "$1"
+    echo "$1 : IDENTIQUE" >> "$ATT"
+    CONFORMES=$((CONFORMES+1))
+  else
+    printf '  >>> DIFFÉRENT — %s\n' "$1"
+    echo "$1 : DIFFERENT (publie $2 / obtenu $3)" >> "$ATT"
+    ECARTS=$((ECARTS+1))
+  fi
+}
+
+abandon() { # impossibilité technique : rien n'est mesurable
+  titre "EXÉCUTION INTERROMPUE"
+  note "$1"
+  note ""
+  note "Aucune mesure n'a pu être effectuée à cette étape."
+  note "Il ne s'agit pas d'un résultat de vérification."
+  note ""
+  [ -f "$ATT" ] && { echo "INTERRUPTION TECHNIQUE : $1" >> "$ATT"; note "Journal partiel : $ATT"; }
+  note "Contact : security@kairossystems.fr"
+  exit 1
+}
+
+# ---------- préambule ----------
+clear 2>/dev/null || true
+titre "KAIROS — VÉRIFICATION GUIDÉE"
+note "Cet outil vérifie, sur VOTRE machine, les empreintes publiées par"
+note "Kairos Systems. Deux parties :"
+note ""
+note "  Partie 1 — le calcul numérique produit-il des résultats identiques ?"
+note "  Partie 2 — un fichier scellé le 2026-06-06 est-il reconstructible ?"
+note ""
+note "Cet outil mesure et consigne. Il n'interprète pas les résultats."
+note "Un écart est enregistré tel quel et l'exécution se poursuit."
+note ""
+note "Tout est écrit dans : $WORK"
+note "Rien n'est installé ailleurs. Aucun mot de passe n'est demandé."
+note "Pour tout effacer ensuite :  rm -rf $WORK"
+echo
+printf '  Appuyez sur Entrée pour commencer (Ctrl+C pour annuler) '
+read -r _ || true
+
+# ---------- plateforme ----------
+titre "ENVIRONNEMENT"
+SYS="$(uname -s)"; ARCH="$(uname -m)"
+case "$SYS/$ARCH" in
+  Linux/x86_64)  MAMBA_PLAT="linux-64" ;;
+  Darwin/x86_64) MAMBA_PLAT="osx-64" ;;
+  Darwin/arm64)  MAMBA_PLAT="osx-arm64" ;;
+  *) note "Système : $SYS $ARCH"
+     abandon "Plateforme non couverte. Attendu : Linux x86_64, macOS x86_64 ou macOS arm64." ;;
+esac
+CPU="$(processeur)"; AVX="$(avx512)"
+note "Système    : $SYS $ARCH"
+note "Processeur : $CPU"
+note "AVX-512    : $AVX"
+note "Python     : $(python3 --version 2>&1)"
+
+for outil in git curl python3 tar; do
+  command -v "$outil" >/dev/null 2>&1 || abandon "Outil requis absent : $outil"
+done
+command -v sha256sum >/dev/null 2>&1 || command -v shasum >/dev/null 2>&1 || \
+  abandon "Aucun utilitaire de calcul d'empreinte disponible (sha256sum ou shasum)."
+
+mkdir -p "$WORK" || abandon "Répertoire de travail non créable : $WORK"
+cd "$WORK" || abandon "Accès impossible à $WORK"
+{
+  echo "KAIROS — DONNÉES D'ATTESTATION"
+  echo "Genere le      : $(date -u '+%Y-%m-%d %H:%M:%S') UTC"
+  echo "Systeme        : $SYS $ARCH"
+  echo "Detail         : $(uname -a)"
+  echo "Processeur     : $CPU"
+  echo "AVX-512        : $AVX"
+  echo "Python systeme : $(python3 --version 2>&1)"
+  echo "Repertoire     : $WORK"
+  echo
+} > "$ATT"
+
+# =============================================================================
+titre "PARTIE 1 — SUBSTRAT NUMÉRIQUE"
+# =============================================================================
+note "Kairos publie douze empreintes obtenues par ses propres mesures."
+note "Cette partie les recalcule sur votre machine."
+
+etape "Étape 1 — récupération du vérificateur depuis le dépôt public"
+cmd "git clone $REPO"
+rm -rf "$WORK/KV"
+git clone -q "$REPO" "$WORK/KV" || abandon "Clone du dépôt impossible."
+(cd "$WORK/KV" && git checkout -q --detach 528f8595bb40c566ba49fb24386bc13869d913e9) || \
+  abandon "Le commit de référence est introuvable dans le dépôt cloné."
+OBT="$(sha256 "$WORK/KV/determinism_ladder.py")"
+note ""
+note "Empreinte du fichier téléchargé :"
+compare "Empreinte du verificateur" "$SCRIPT_ATTENDU" "$OBT"
+echo "determinism_ladder.py : $OBT" >> "$ATT"
+
+etape "Étape 2 — préparation de l'environnement de calcul"
+cmd "python3 -m venv env  puis  pip install -r requirements.txt"
+note "  (numpy, pandas, xgboost — quelques dizaines de secondes)"
+cd "$WORK/KV" || abandon "Accès impossible à $WORK/KV"
+if pyver_ok; then
+  note "  python3 du système : $(python3 --version 2>&1) — utilisable"
+  python3 -m venv env >/dev/null 2>&1 || abandon "Création de l'environnement Python impossible."
+  PY1="$WORK/KV/env/bin/python3"
+  PIP1="$WORK/KV/env/bin/pip"
+  VOIE1="venv sur python3 du système"
+else
+  note "  python3 du système : $(python3 --version 2>&1) — hors enveloppe 3.10 à 3.12"
+  note "  Les mesures publiées portent sur Python 3.10 à 3.12."
+  note "  Un interpréteur 3.12 est installé dans le répertoire de travail."
+  export MAMBA_ROOT_PREFIX="$WORK/.mamba"
+  get_micromamba || abandon "Téléchargement de micromamba impossible ($MAMBA_PLAT)."
+  OMPPKG=""
+  [ "$SYS" = "Darwin" ] && OMPPKG="llvm-openmp"
+  "$WORK/bin/micromamba" create -y -p "$WORK/py312" python=3.12 pip $OMPPKG -c conda-forge >/dev/null 2>&1 || \
+    abandon "Création de l'interpréteur 3.12 impossible."
+  PY1="$WORK/py312/bin/python"
+  PIP1="$WORK/py312/bin/pip"
+  VOIE1="micromamba python 3.12"
+  cd "$WORK/KV" || abandon "Accès impossible à $WORK/KV"
+fi
+"$PIP1" install --quiet -r requirements.txt >/dev/null 2>&1 || \
+  abandon "Installation des bibliothèques impossible."
+VP1="$("$PY1" -c 'import sys,numpy,pandas;print(sys.version.split()[0],numpy.__version__,pandas.__version__)' 2>/dev/null)"
+note "  environnement prêt — $VOIE1"
+note "  python/numpy/pandas : $VP1"
+echo "Partie 1 — voie : $VOIE1" >> "$ATT"
+echo "Partie 1 — python/numpy/pandas : $VP1" >> "$ATT"
+
+etape "Étape 3 — exécution dans l'enveloppe déclarée"
+cmd "OPENBLAS_CORETYPE=Haswell OMP_NUM_THREADS=1 ... python3 determinism_ladder.py"
+OPENBLAS_CORETYPE=Haswell \
+OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
+PYTHONHASHSEED=0 \
+"$PY1" determinism_ladder.py > "$WORK/ladder.txt" 2>&1 || \
+  abandon "Exécution du vérificateur impossible. Voir $WORK/ladder.txt"
+
+note ""
+P1_OK=0; P1_KO=0
+echo "--- Partie 1 : empreintes ---" >> "$ATT"
+while read -r niveau publie; do
+  [ -z "$niveau" ] && continue
+  obtenu="$(awk -v n="$niveau" '$1==n { for(i=2;i<=NF;i++) if ($i ~ /^[0-9a-f]{64}$/) { print $i; exit } }' "$WORK/ladder.txt")"
+  [ -z "$obtenu" ] && obtenu="(non lu)"
+  if [ "$publie" = "$obtenu" ]; then etat="identique"; P1_OK=$((P1_OK+1))
+  else etat="DIFFÉRENT"; P1_KO=$((P1_KO+1)); fi
+  printf '  %-5s publie %s   obtenu %s   %s\n' "$niveau" "$publie" "$obtenu" "$etat"
+  echo "$niveau publie=$publie obtenu=$obtenu" >> "$ATT"
+done <<< "$LADDER_ATTENDU"
+
+note ""
+note "  Partie 1 — $P1_OK empreintes identiques sur 12."
+echo "Partie 1 : $P1_OK identiques / 12" >> "$ATT"
+
+
+etape "Étape 4 — mesure sans la variable OPENBLAS_CORETYPE"
+note "  Le même calcul est relancé sans cette variable. Le résultat est"
+note "  consigné sans interprétation."
+OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 PYTHONHASHSEED=0 \
+"$PY1" determinism_ladder.py > "$WORK/ladder_sans.txt" 2>/dev/null
+L3S="$(awk '$1=="L3" { for(i=2;i<=NF;i++) if ($i ~ /^[0-9a-f]{64}$/) { print $i; exit } }' "$WORK/ladder_sans.txt")"
+note ""
+note "  L3 avec la variable : $(awk '$1=="L3" { for(i=2;i<=NF;i++) if ($i ~ /^[0-9a-f]{64}$/) { print $i; exit } }' "$WORK/ladder.txt")"
+note "  L3 sans la variable : ${L3S:-(non lu)}"
+{ echo "--- Partie 1 : sans OPENBLAS_CORETYPE ---"
+  echo "L3 sans OPENBLAS_CORETYPE : ${L3S:-non lu}"; } >> "$ATT"
+
+# =============================================================================
+titre "PARTIE 2 — REJEU D'UN FICHIER SCELLÉ"
+# =============================================================================
+note "Kairos publie l'empreinte d'un fichier enregistré le 2026-06-06, produit"
+note "à partir d'un jeu de données scientifique public."
+note "Cette partie le reconstruit sur votre machine."
+
+etape "Étape 1 — téléchargement du jeu de données depuis sa source d'origine"
+cmd "curl -o BBBP.csv $CSV_URL"
+note "  Ce fichier provient de DeepChem, pas de Kairos."
+mkdir -p "$WORK/rejeu" || abandon "Répertoire de rejeu non créable."
+cd "$WORK/rejeu" || abandon "Accès impossible au répertoire de rejeu."
+curl -sL -o BBBP.csv "$CSV_URL" || abandon "Téléchargement du jeu de données impossible."
+OBT="$(sha256 BBBP.csv)"
+note ""
+compare "Empreinte du jeu de donnees" "$CSV_ATTENDU" "$OBT"
+echo "BBBP.csv : $OBT" >> "$ATT"
+
+etape "Étape 2 — environnement de reconstruction"
+note "  L'empreinte du fichier produit dépend des versions exactes des"
+note "  bibliothèques. L'environnement requis est :"
+note "     Python 3.10 · pandas 1.5.3 · pyarrow 23.0.0 · numpy < 2"
+note ""
+note "  micromamba est téléchargé dans ce répertoire uniquement."
+note "  Aucune installation système, aucun droit administrateur."
+cmd "micromamba create -p ./env310 python=3.10 pip   [$MAMBA_PLAT]"
+export MAMBA_ROOT_PREFIX="$WORK/.mamba"
+get_micromamba || abandon "Téléchargement de micromamba impossible ($MAMBA_PLAT)."
+cd "$WORK/rejeu" || abandon "Accès impossible au répertoire de rejeu."
+"$WORK/bin/micromamba" create -y -p "$WORK/rejeu/env310" python=3.10 pip -c conda-forge >/dev/null 2>&1 || \
+  abandon "Création de l'environnement de reconstruction impossible."
+"$WORK/rejeu/env310/bin/pip" install --quiet \
+  "pandas==1.5.3" "pyarrow==23.0.0" "numpy<2" >/dev/null 2>&1 || \
+  abandon "Installation de pandas/pyarrow impossible."
+VP2="$("$WORK/rejeu/env310/bin/python" -c \
+  'import sys,pandas,pyarrow,numpy;print(sys.version.split()[0],pandas.__version__,pyarrow.__version__,numpy.__version__)')"
+note ""
+note "  Environnement obtenu — python/pandas/pyarrow/numpy : $VP2"
+{ echo "--- Partie 2 : environnement ---"
+  echo "plateforme micromamba : $MAMBA_PLAT"
+  echo "python/pandas/pyarrow/numpy : $VP2"; } >> "$ATT"
+
+etape "Étape 3 — reconstruction du fichier"
+note "  Trois instructions de bibliothèques publiques, aucun composant Kairos :"
+cmd "read_csv → Table.from_pandas → write_table(compression='snappy')"
+"$WORK/rejeu/env310/bin/python" - > "$WORK/rejeu/sortie.txt" 2>&1 <<'PYEOF'
+import pandas as pd, pyarrow as pa, pyarrow.parquet as pq, hashlib
+df = pd.read_csv("BBBP.csv", low_memory=False)
+print("lignes:", len(df))
+pq.write_table(pa.Table.from_pandas(df), "bbbp.parquet", compression="snappy")
+print("sha256:", hashlib.sha256(open("bbbp.parquet","rb").read()).hexdigest())
+PYEOF
+LIGNES="$(awk '/^lignes:/ {print $2}' "$WORK/rejeu/sortie.txt")"
+OBT="$(awk '/^sha256:/ {print $2}' "$WORK/rejeu/sortie.txt")"
+[ -z "$OBT" ] && abandon "La reconstruction n'a produit aucun fichier. Voir $WORK/rejeu/sortie.txt"
+note ""
+note "  Lignes lues : ${LIGNES:-?}   (2050 publiées)"
+note ""
+compare "Empreinte du fichier reconstruit" "$PARQUET_ATTENDU" "$OBT"
+{ echo "Lignes lues : ${LIGNES:-?} (2050 publiees)"
+  echo "bbbp.parquet : $OBT"; } >> "$ATT"
+
+# =============================================================================
+titre "SYNTHÈSE DES MESURES"
+# =============================================================================
+note "Partie 1 — échelle de déterminisme : $P1_OK empreintes identiques sur 12"
+note "Empreintes de fichiers  : $CONFORMES identiques, $ECARTS différentes"
+note "  (vérificateur, jeu de données, fichier reconstruit)"
+note ""
+note "Cet outil ne qualifie pas ces résultats. L'interprétation relève du"
+note "protocole, qui précise ce qui est attendu selon l'environnement."
+{ echo
+  echo "--- SYNTHESE ---"
+  echo "Partie 1 (echelle) : $P1_OK identiques / 12"
+  echo "Empreintes de fichiers : $CONFORMES identiques, $ECARTS differentes"
+  echo "Aucune interpretation n'est faite par l'outil."; } >> "$ATT"
+
+titre "ET MAINTENANT"
+note "Toutes les mesures sont consignées dans :"
+note ""
+note "    $ATT"
+note ""
+note "Reportez ces valeurs dans le modèle d'attestation du protocole,"
+note "puis datez et signez."
+note ""
+note "Vous attestez avoir exécuté ces opérations et observé ces résultats."
+note "Rien de plus. Vous ne certifiez ni ne validez Kairos Systems."
+note ""
+note "Question ou écart : security@kairossystems.fr"
+note "Pour tout effacer :  rm -rf $WORK"
+echo
+exit 0</script>
+<script type="text/plain" id="f-dockerfile">
+FROM python:3.10.12-slim
+RUN pip install --no-cache-dir pandas==1.5.3 pyarrow==23.0.0 "numpy<2"
+WORKDIR /demo
+COPY replay.py /demo/replay.py
+CMD ["python3", "replay.py"]
+</script>
+<script type="text/plain" id="f-replay">
+import hashlib, urllib.request, pandas as pd, pyarrow as pa, pyarrow.parquet as pq
+print("pandas", pd.__version__, "| pyarrow", pa.__version__, "| numpy", __import__("numpy").__version__)
+SOURCE="https://deepchemdata.s3.us-west-1.amazonaws.com/datasets/BBBP.csv"
+CSV_ATTENDU="d07a38487aeac5cee5508413e468043ef3097451d2a112701c2d60be9ec6b662"
+SCELLE="4621ac8d5d4a728a169fb4d5b8c35682b954928a019d575e3eca140cd563489f"
+sha=lambda p: hashlib.sha256(open(p,"rb").read()).hexdigest()
+urllib.request.urlretrieve(SOURCE,"BBBP.csv")
+c=sha("BBBP.csv"); print("CSV     :", c, "OK" if c==CSV_ATTENDU else "!! DIFF")
+df=pd.read_csv("BBBP.csv",low_memory=False)
+pq.write_table(pa.Table.from_pandas(df),"bbbp.parquet",compression="snappy")
+o=sha("bbbp.parquet"); print("parquet :", o); print("scelle  :", SCELLE)
+print(">>> MATCH" if o==SCELLE else ">>> DIVERGE")
+</script>
+<script type="text/plain" id="f-env">
+name: kairos-repro
+channels: [conda-forge]
+dependencies:
+  - python=3.10.12
+  - pip
+  - pip:
+    - pandas==1.5.3
+    - pyarrow==23.0.0
+    - numpy<2
+</script>
+<script type="text/plain" id="f-bundle">
+SHADOW_RUN_AUDIT_INSTANCE_B
+FINAL_RECONCILIATION_ROOT: e25092629bf1e08c5f91b7fb684e9e54f879d11608cc2cb6af3c8e1f0a30cd87
+MERKLE_ROOT_8_6: c307495f654a5036ebbe1e11fe3c879e21f135c4d163d034df36b89b46889082
+MASTER_SHA256_8_7: 98966d499e5d4839ba10dc4b3cffadfda2c593b52bd0c30a58cc188b5d0963b5
+PROVENANCE_ROOT_B: a0eb54588a2ea7ad6a9d3682690d658e969f20665781512e6ce5dc951627c65b
+PROTOCOL: SHADOW_RUN_PROTOCOL_V1.7 + AMENDMENT_001
+VERDICT: FULL PASS
+DATE: 2026-06-06
+</script>
+<script type="text/plain" id="f-sums">
+d07a38487aeac5cee5508413e468043ef3097451d2a112701c2d60be9ec6b662  BBBP.csv
+abec64b2077fe4fc31df35ec018a58a80acf210734f633cddf15223b70c7531f  Dockerfile
+e482ba3c578f25f34719708237dd2898411a70cf351479a9b5425669bc7fea03  Merkle_Proofs_20260606T130009Z.json
+c0a1be302ac2741bd65ca7411943e9fd57f746f13b0714dc3cd242b1435398d7  audit_bundle.txt
+4621ac8d5d4a728a169fb4d5b8c35682b954928a019d575e3eca140cd563489f  bbbp.parquet
+9b04792f2101b63fd0b46416f7c6cba327a5d2a718f6c55723493dec3e1adebd  environment.yml
+ebb80d0b9d8852e65d2995b78de725184eaff09b2391276dc8460b98c39b542a  kairos_merkle.py
+53f9d4a660dea7a28b06d8fb7535ca4c09b6b22bf5e575227a7eda26290df35b  replay.py
+1afe15f8a6b33d74b487d00acb49aaa07adb20a8a2ec93c22192ae4571a84e76  sectigo.tsr
+c3dce3455e65dd633b3ad17382f973e68ababafcb631f134d374227f183ea775  swisssign.tsr
+3b51d1bf970b1c98895a91d0a799507cf3a4fc544c2652c06f4d13c44c59e73e  swisssign_embedded_chain.pem
+</script>
+<script type="text/plain" id="f-readme">
+# KAIROS — Kit de reproductibilité Niveau 2 (BBBP)
+
+**Vérification indépendante d'un artefact scellé, sans Kairos.**
+
+Ce kit permet à un tiers de reconstruire, sur sa propre machine, un artefact
+produit lors du Shadow Run du 2026-06-06, d'en retrouver l'empreinte scellée, sa
+place dans l'arbre de Merkle, et de vérifier que cette empreinte a été horodatée
+par deux autorités de datation indépendantes lors du Shadow Run du 2026-06-06.
+
+> **Nature de la preuve.** La preuve est la *reproduction byte-identique de
+> l'artefact scellé* (`bbbp.parquet` = `4621ac8d…`). L'image Docker et
+> l'environnement micromamba ne sont que des **moyens** de reconstruire
+> l'enveloppe d'exécution figée. Le hash de l'archive Docker (`docker save`)
+> n'est **pas** revendiqué comme propriété de reproductibilité : il varie selon
+> le moteur Docker et le format d'export sans changer l'environnement. Le
+> `Dockerfile` et `environment.yml` décrivent l'environnement ; le `>>> MATCH`
+> en constitue la vérification.
+
+---
+
+## Enveloppe officielle (figée)
+
+```
+Python   3.10.12
+pandas   1.5.3
+pyarrow  23.0.0
+numpy    1.26.4  (contrainte : numpy < 2)
+```
+
+Transformation appliquée :
+`read_csv(low_memory=False)` → `pyarrow.Table.from_pandas(df)` →
+`write_table(compression="snappy")`.
+
+Deux véhicules équivalents pour recréer cette enveloppe :
+- **Docker** — via `Dockerfile` (machine disposant de Docker) ;
+- **micromamba** — via `environment.yml` (notebooks : Colab, Kaggle, etc.).
+
+Reproductibilité vérifiée le 2026-07-22 sur trois environnements tiers
+indépendants (Codespaces via Docker, Colab et Kaggle via micromamba), ainsi
+qu'en environnement de développement local hors-ligne. Toutes les vérifications
+ont produit le hash attendu (`4621ac8d…`).
+
+---
+
+## Contenu du kit
+
+| Fichier | SHA-256 | Rôle |
+|---|---|---|
+| `Dockerfile` | `abec64b2…c7531f` | recette d'enveloppe (Docker) |
+| `environment.yml` | `9b04792f…1adebd` | recette d'enveloppe (micromamba) |
+| `replay.py` | `53f9d4a6…90df35b` | script de reconstruction du parquet |
+| `BBBP.csv` | `d07a3848…6b662` | données publiques (source : DeepChem), fournies hors-ligne |
+| `bbbp.parquet` | `4621ac8d…3489f` | **artefact scellé de référence** |
+| `kairos_merkle.py` | `ebb80d0b…542a` | reconstruction de l'arbre de Merkle (RFC 6962) |
+| `Merkle_Proofs_20260606T130009Z.json` | `e482ba3c…fea03` | 46 feuilles + preuves d'inclusion |
+| `audit_bundle.txt` | `c0a1be30…398d7` | document horodaté du Shadow Run (porte la racine) |
+| `swisssign.tsr` | `c3dce345…3ea775` | horodatage SwissSign du run (2026-06-06) |
+| `sectigo.tsr` | `1afe15f8…a84e76` | horodatage Sectigo du run (2026-06-06) |
+| `swisssign_embedded_chain.pem` | `3b51d1bf…c59e73e` | chaîne de certificats SwissSign |
+| `SHA256SUMS` | `d68caaab…8c6dfd` | manifeste des 11 pièces ci-dessus |
+| `kit.tsq` / `kit_sectigo.tsr` / `kit_swisssign.tsr` | — | scellement du kit (voir étape 7) |
+
+Le manifeste `SHA256SUMS` couvre les 11 pièces de données. Les jetons `kit_*.tsr`
+scellent le manifeste et vivent **à côté** de lui (un manifeste ne peut pas
+contenir l'empreinte de ce qui le scelle).
+
+---
+
+## Vérification — 7 étapes
+
+### 1. Reconstruire l'enveloppe
+
+**Docker :**
+```bash
+docker build -t kairos-repro:1.0 .
+docker run --rm kairos-repro:1.0
+```
+
+**ou micromamba (notebook / sans Docker) :**
+```bash
+micromamba create -y -p ./env python=3.10.12 pip -c conda-forge
+./env/bin/pip install pandas==1.5.3 pyarrow==23.0.0 "numpy<2"
+# exécution robuste, sans initialisation de shell : appeler l'interpréteur par son chemin
+./env/bin/python replay.py
+```
+
+### 2. Reproduire `BBBP.csv`
+Empreinte attendue (identique à la copie hors-ligne fournie) :
+```
+d07a38487aeac5cee5508413e468043ef3097451d2a112701c2d60be9ec6b662
+```
+
+### 3. Reproduire `bbbp.parquet` — **le cœur de la preuve**
+`replay.py` exécute exactement ces opérations (ne pas réécrire le code) :
+```python
+import pandas as pd, pyarrow as pa, pyarrow.parquet as pq
+df = pd.read_csv("BBBP.csv", low_memory=False)
+pq.write_table(pa.Table.from_pandas(df), "bbbp.parquet", compression="snappy")
+```
+Empreinte attendue :
+```
+4621ac8d5d4a728a169fb4d5b8c35682b954928a019d575e3eca140cd563489f
+```
+→ `>>> MATCH` avec l'artefact scellé du 2026-06-06.
+
+### 4. Calculer la feuille de Merkle (RFC 6962)
+La feuille n'est pas le hash brut du parquet, mais :
+```
+feuille = SHA256( 0x00 || sha256_parquet_bytes )
+```
+(préfixe `0x00` = domaine « feuille » de la RFC 6962 / Certificate Transparency ;
+règle lisible dans `kairos_merkle.py`).
+
+### 5. Recomposer la racine de Merkle
+```bash
+python3 kairos_merkle.py
+```
+Attendu :
+```
+set digest recalc == set digest scellé : ac40fe6c…f55b66   → feuilles authentifiées
+MERKLE ROOT : 5200d0cdb4597394c0d40f4b75bb7365c216404c9522d4432b89f7d311709a81
+preuves : 46/46 valides   (BBBP = feuille index 19)
+>>> MATCH
+```
+
+### 6. Vérifier le double horodatage du Shadow Run
+Le document `audit_bundle.txt` porte la racine du run
+(`MERKLE_ROOT_8_6: c307495f…`). Il a été horodaté le **2026-06-06 17:59:04 UTC**
+par deux autorités de datation indépendantes :
+- **SwissSign** — TSA qualifiée au sens du droit suisse (ZertES) ;
+- **Sectigo** (UK) — TSA à confiance publique, non qualifiée eIDAS UE.
+```bash
+openssl ts -verify -data audit_bundle.txt -in swisssign.tsr -CAfile swisssign_embedded_chain.pem
+openssl ts -verify -data audit_bundle.txt -in sectigo.tsr   -CApath /etc/ssl/certs
+```
+Attendu : `Verification: OK` pour chacune.
+
+### 7. Vérifier le scellement du kit lui-même
+Le manifeste `SHA256SUMS` (empreinte `d68caaab…`) a été horodaté le
+**2026-07-22 16:41:13 UTC** par les deux mêmes autorités :
+```bash
+openssl ts -verify -data SHA256SUMS -in kit_sectigo.tsr   -CApath /etc/ssl/certs
+openssl ts -verify -data SHA256SUMS -in kit_swisssign.tsr -CAfile swisssign_embedded_chain.pem
+```
+Attendu : `Verification: OK` pour chacune.
+
+---
+
+## Ce que la chaîne établit
+
+```
+CSV public  →  parquet reproduit  →  feuille RFC 6962  →  racine Merkle  →  horodatage
+d07a3848        4621ac8d              SHA256(0x00||…)       5200d0cd          2 TSA, 06-06
+```
+
+Chaque maillon est **exécutable et vérifiable par le tiers**, sans dépendre de
+Kairos, sans accéder au moteur propriétaire, sans les données privées. La reconstruction
+part d'un jeu de données public et aboutit à deux horodatages indépendants — dont un qualifié au sens du droit suisse
+(ZertES, SwissSign) — qui établissent une preuve d'antériorité
+cryptographiquement vérifiable.
+
+Toute personne disposant de ce kit peut reproduire indépendamment l'artefact
+scellé, vérifier son inclusion dans l'arbre de Merkle et contrôler les
+horodatages, sans accès au moteur Kairos ni à l'infrastructure ayant produit le
+Shadow Run.
+
+## Portée et limites (déclarées)
+
+- Ce kit démontre la reproductibilité **d'un artefact** du Shadow Run (BBBP,
+  feuille 19 sur 46), et l'intégrité de l'arbre complet + son horodatage.
+- Il **ne rejoue pas** le pipeline Kairos complet ni le moteur ; ceux-ci restent
+  hors périmètre de ce kit (démonstration pilotée séparée).
+- Les valeurs de reproductibilité byte-identique supposent l'enveloppe figée
+  ci-dessus. La reproductibilité byte-identique est démontrée dans l'enveloppe
+  déclarée.
+
+---
+*Kit scellé le 2026-07-22. Diffusion sous accord de confidentialité.*
+</script>
+
+<button id="ktop" aria-label="Back to top" title="Back to top"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M8 13V3M3.5 7.5 8 3l4.5 4.5"/></svg></button>
+
+<script>
+(function() {
+  function generateGrain() {
+    var canvas = document.getElementById('ks-grain');
+    if (!canvas || !canvas.getContext) return;
+    var W = window.innerWidth, H = window.innerHeight;
+    canvas.width = W; canvas.height = H;
+    var ctx = canvas.getContext('2d');
+    var imageData = ctx.createImageData(W, H);
+    var data = imageData.data;
+    for (var i = 0; i < data.length; i += 4) {
+      var v = Math.random() * 255 | 0;
+      data[i]=v; data[i+1]=v; data[i+2]=v; data[i+3]=18;
+    }
+    ctx.putImageData(imageData, 0, 0);
+  }
+  if ('requestIdleCallback' in window) { requestIdleCallback(generateGrain); }
+  else { setTimeout(generateGrain, 0); }
+  window.addEventListener('resize', generateGrain);
+  function updateProgress() {
+    var h=document.documentElement;
+    var st=h.scrollTop||document.body.scrollTop;
+    var sh=(h.scrollHeight||document.body.scrollHeight)-h.clientHeight;
+    var p=document.getElementById('progress');
+    if(p) p.style.width=(sh>0?(st/sh*100):0)+'%';
+  }
+  document.addEventListener('scroll', updateProgress);
+  updateProgress();
+})();
+</script>
+<script>(function(){
+var CI='<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="9"/><path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/></svg>';
+var DI='<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 8.5 6.5 12 13 4.5"/></svg>';
+function cp(t){ if(navigator.clipboard&&window.isSecureContext) return navigator.clipboard.writeText(t);
+  return new Promise(function(r){var a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.opacity='0';
+  document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}document.body.removeChild(a);r();}); }
+document.querySelectorAll('pre.code').forEach(function(pre){
+  var w=document.createElement('div'); w.className='cwrap';
+  pre.parentNode.insertBefore(w,pre); w.appendChild(pre);
+  var b=document.createElement('button'); b.className='cbtn'; b.type='button';
+  b.title='Copy'; b.setAttribute('aria-label','Copy block'); b.innerHTML=CI;
+  b.addEventListener('click',function(){ cp(pre.innerText).then(function(){
+    b.classList.add('ok'); b.innerHTML=DI;
+    setTimeout(function(){b.classList.remove('ok');b.innerHTML=CI;},1400); }); });
+  w.appendChild(b);
+});
+
+var H={
+ "1afe15f8":"1afe15f8a6b33d74b487d00acb49aaa07adb20a8a2ec93c22192ae4571a84e76",
+ "34dbeb14":"34dbeb1490c371f29aed1ddce3264096e47818d183f97be8333e95fc0eb750a9",
+ "3b51d1bf":"3b51d1bf970b1c98895a91d0a799507cf3a4fc544c2652c06f4d13c44c59e73e",
+ "4621ac8d":"4621ac8d5d4a728a169fb4d5b8c35682b954928a019d575e3eca140cd563489f",
+ "5200d0cd":"5200d0cdb4597394c0d40f4b75bb7365c216404c9522d4432b89f7d311709a81",
+ "53f9d4a6":"53f9d4a660dea7a28b06d8fb7535ca4c09b6b22bf5e575227a7eda26290df35b",
+ "5b8a397a":"5b8a397a44537b8cb15944a454ad3a3c0660d19fe2b8d8a1c93ccbd3bdf0cb29",
+ "93eefa09":"93eefa09ac662e1f5f530b101e71e3a091d6750e5a91da91cc5d4cced8c1a800",
+ "98966d49":"98966d499e5d4839ba10dc4b3cffadfda2c593b52bd0c30a58cc188b5d0963b5",
+ "9b04792f":"9b04792f2101b63fd0b46416f7c6cba327a5d2a718f6c55723493dec3e1adebd",
+ "a0eb5458":"a0eb54588a2ea7ad6a9d3682690d658e969f20665781512e6ce5dc951627c65b",
+ "abec64b2":"abec64b2077fe4fc31df35ec018a58a80acf210734f633cddf15223b70c7531f",
+ "ac40fe6c":"ac40fe6cf8fd5cad9a8c262726f1f77cf50038d8bc52761f4b0405a568f55b66",
+ "b5606966":"b560696650216dc5d2017feee0904b5540d998020345c581d676eaecf2bd12e1",
+ "c0a1be30":"c0a1be302ac2741bd65ca7411943e9fd57f746f13b0714dc3cd242b1435398d7",
+ "c307495f":"c307495f654a5036ebbe1e11fe3c879e21f135c4d163d034df36b89b46889082",
+ "c3dce345":"c3dce3455e65dd633b3ad17382f973e68ababafcb631f134d374227f183ea775",
+ "ca00771b":"ca00771b1276abea2931c57365bff839e451bcd686a594032b9ce8f37f24567f",
+ "d07a3848":"d07a38487aeac5cee5508413e468043ef3097451d2a112701c2d60be9ec6b662",
+ "d4902f34":"d4902f341deedd56092b02949656c1864b3883bf5c45317ee3c00d3d430611b7",
+ "d68caaab":"d68caaab1d9d9824a335ecb1ba194ed84b76f2c7309bbc7cba519a3dad8c6dfd",
+ "e2509262":"e25092629bf1e08c5f91b7fb684e9e54f879d11608cc2cb6af3c8e1f0a30cd87",
+ "e482ba3c":"e482ba3c578f25f34719708237dd2898411a70cf351479a9b5425669bc7fea03",
+ "e4c685ae":"e4c685aec2eb6480091e96aba0e39ba77b73406985bf5b0c85da355deb0d6da7",
+ "ebb80d0b":"ebb80d0b9d8852e65d2995b78de725184eaff09b2391276dc8460b98c39b542a",
+ "e2f6cd4b":"e2f6cd4b4e67e98d19adbd76e9e8c12eae0276cca3755b324e55f3b966525be4"};
+document.querySelectorAll('.hash').forEach(function(s){
+  var t=s.textContent.trim(), k=t.slice(0,8).toLowerCase(), full=H[k]||(/^[0-9a-f]{16,64}$/.test(t)?t:null);
+  if(!full) return;
+  if(s.closest('footer')){
+    s.classList.add('cp'); s.setAttribute('role','button'); s.setAttribute('tabindex','0');
+    s.title='Copier '+full;
+    s.addEventListener('click',function(){ cp(full).then(function(){ s.classList.add('ok'); setTimeout(function(){s.classList.remove('ok');},1400); }); });
+    s.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault(); cp(full).then(function(){ s.classList.add('ok'); setTimeout(function(){s.classList.remove('ok');},1400); }); } });
+    return;
+  }
+  s.classList.add('cp'); s.setAttribute('role','button'); s.setAttribute('tabindex','0');
+  s.title='Copier '+full;
+  var ic=document.createElement('span'); ic.style.marginLeft='5px'; ic.style.opacity='.4'; ic.innerHTML=CI;
+  s.appendChild(ic);
+  function go(){ cp(full).then(function(){ s.classList.add('ok'); ic.innerHTML=DI; ic.style.opacity='1';
+    setTimeout(function(){s.classList.remove('ok');ic.innerHTML=CI;ic.style.opacity='.4';},1400); }); }
+  s.addEventListener('click',go);
+  s.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();go();} });
+});
+
+/* --- téléchargements embarqués --- */
+document.querySelectorAll('[data-dl]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var el=document.getElementById(b.dataset.dl); if(!el) return;
+    var txt=el.textContent.replace(/^\n/,'');
+    var u=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'}));
+    var a=document.createElement('a'); a.href=u; a.download=b.dataset.name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(u);},3000);
+  });
+});
+
+/* --- menu : filtre --- */
+var q=document.getElementById('kq'), grid=document.getElementById('kgrid'), none=document.getElementById('knone');
+if(q){ var links=Array.prototype.slice.call(grid.querySelectorAll('a'));
+  q.addEventListener('input',function(){
+    var v=q.value.trim().toLowerCase(), n=0;
+    links.forEach(function(a){ var ok=!v||a.textContent.toLowerCase().indexOf(v)>-1;
+      a.classList.toggle('hide',!ok); if(ok)n++; });
+    none.style.display=n?'none':'block';
+  });
+  q.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){q.value='';q.dispatchEvent(new Event('input'));}
+    if(e.key==='Enter'){var f=links.filter(function(a){return !a.classList.contains('hide')})[0]; if(f)f.click();}
+  });
+}
+
+/* --- mise en évidence de la section ciblée --- */
+function flash(id){ var s=document.querySelector(id); if(!s) return;
+  s.classList.add('flash'); setTimeout(function(){s.classList.remove('flash');},1300); }
+document.querySelectorAll('#kgrid a, .kchain .cn, .plink').forEach(function(a){
+  a.addEventListener('click',function(){ setTimeout(function(){flash(a.getAttribute('href'));},60); });
+});
+document.querySelectorAll('.kchain .cn').forEach(function(n){
+  n.setAttribute('tabindex','0');
+  n.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();
+    window.location.hash=n.getAttribute('href'); flash(n.getAttribute('href'));} });
+});
+
+/* --- retour en haut --- */
+var top=document.getElementById('ktop');
+window.addEventListener('scroll',function(){ top.classList.toggle('show',window.scrollY>800); },{passive:true});
+top.addEventListener('click',function(){ window.scrollTo({top:0,behavior:'smooth'}); });
+})();
+</script>
+
+
+<script>
+/* ── Curseur croix suisse (comme master) : suit la souris, disparaît à l'inactivité ── */
+(function(){
+  var st = document.createElement('style');
+  st.textContent = 'html,body{cursor:none;} *{cursor:none !important;} #progress{display:none!important;}'
+    + '#nav-ch{position:fixed;top:0;left:0;opacity:0;transition:opacity .35s ease;'
+    + 'pointer-events:none;z-index:99998;transform:translate3d(-200px,-200px,0);width:14px;height:14px;line-height:0;}';
+  document.head.appendChild(st);
+  var el = document.createElement('div'); el.id = 'nav-ch';
+  el.innerHTML = '<svg width="14" height="14" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">'
+    + '<rect x="13" y="6" width="6" height="20" fill="#fff"/>'
+    + '<rect x="6" y="13" width="20" height="6" fill="#fff"/></svg>';
+  document.body.appendChild(el);
+  var idle = null;
+  document.addEventListener('mousemove', function(e){
+    el.style.transform = 'translate3d(' + (e.clientX - 7) + 'px,' + (e.clientY - 7) + 'px,0)';
+    el.style.opacity = '1';
+    if(idle) clearTimeout(idle);
+    idle = setTimeout(function(){ el.style.opacity = '0'; }, 1200);
+  });
+})();
+</script>
+</body>
+</html>
