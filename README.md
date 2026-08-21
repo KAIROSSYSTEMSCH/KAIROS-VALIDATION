@@ -1,11 +1,11 @@
 # KAIROS — Démonstration de reproductibilité (Acte 2)
 
 Rejeu d'un artefact scellé le 2026-06-06, à partir d'un jeu de données public (BBBP, DeepChem).
-Aucun composant propriétaire Kairos. Trois appels de bibliothèques open source (pandas, pyarrow).
+Aucun composant propriétaire Kairos. Le replay s'appuie uniquement sur des bibliothèques open source.
 
 ## 1. Chemin principal — machine locale
 
-C'est le replay qui a la plus grande valeur probatoire : il ne dépend d'aucune infrastructure Kairos.
+C'est le chemin de référence : il ne dépend d'aucune infrastructure Kairos.
 
 ```bash
 # 0 — récupérer les fichiers de ce dépôt (si pas déjà fait)
@@ -45,12 +45,15 @@ Utiles pour un premier aperçu ou en l'absence d'environnement local disponible.
 Ne remplacent pas la valeur probatoire du replay local (voir section « Chemin principal »).
 
 - **Colab** : `KAIROS_VALIDATION_Replay.ipynb` — Runtime → Run all
-- **Codespaces** : ouverture automatique, replay lancé dès la création de l'environnement (voir `.devcontainer/`)
+- **Codespaces** : une fois l'environnement ouvert, dans le terminal :
+  ```bash
+  bash .devcontainer/run_verifier.sh
+  ```
 - **Kaggle** : [kairos-validation-replay](https://www.kaggle.com/code/kairossystems/kairos-validation-replay) — nécessite un compte (gratuit) et de cliquer « Copy & Edit »
 
 ## 3. Si le résultat diverge
 
-- **`Source SHA-256` ne correspond pas ?** Le fichier `BBBP.csv` téléchargé diffère de la source DeepChem d'origine — revérifiez votre connexion, retéléchargez.
+- **`Source SHA-256` ne correspond pas ?** Le fichier `BBBP.csv` ne correspond pas à l'empreinte de la source de référence — retéléchargez-le depuis la source indiquée.
 - **`Reconstruction` ou `Sealed artifact` ne correspond pas ?** Vérifiez les versions exactes de pandas/pyarrow/numpy (l'empreinte dépend de la version précise, pas seulement de la version majeure) — comparez avec les versions indiquées à l'étape 2.
 - **Le script échoue avant d'afficher un résultat ?** Vérifiez l'empreinte du script lui-même avant exécution (voir ci-dessous) — s'il ne correspond pas, ne l'exécutez pas, contactez-nous.
 

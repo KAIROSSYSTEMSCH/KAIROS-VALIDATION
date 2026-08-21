@@ -1,10 +1,9 @@
 {
-  "name": "KAIROS VALIDATION — Acte 2 replay automatique",
+  "name": "KAIROS VALIDATION — Acte 2 replay",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
     "ghcr.io/devcontainers/features/python:1": {
       "version": "3.12"
     }
-  },
-  "postCreateCommand": "bash .devcontainer/run_verifier.sh"
+  }
 }
